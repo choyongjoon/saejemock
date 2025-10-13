@@ -1,6 +1,7 @@
+import { SignInButton, useUser } from "@clerk/clerk-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAction } from "convex/react";
-import { Film, Search } from "lucide-react";
+import { Film, LogIn, Search } from "lucide-react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 
@@ -20,6 +21,7 @@ type KobisMovieResult = {
 };
 
 function AddMoviePage() {
+	const { isSignedIn, user } = useUser();
 	const [searchQuery, setSearchQuery] = useState("");
 	const [searchResults, setSearchResults] = useState<KobisMovieResult[]>([]);
 	const [isSearching, setIsSearching] = useState(false);
@@ -137,40 +139,69 @@ function AddMoviePage() {
 					<p className="text-gray-400">
 						영화진흥위원회(KOBIS)에서 영화를 검색하여 추가하세요
 					</p>
-				</div>
-
-				{/* Search Form */}
-				<div className="mb-8 rounded-xl border border-slate-700 bg-slate-800/50 p-6 backdrop-blur-sm">
-					<form className="flex gap-3" onSubmit={handleSearch}>
-						<div className="relative flex-1">
-							<Search className="absolute top-3 left-3 h-5 w-5 text-gray-400" />
-							<input
-								className="w-full rounded-lg border border-slate-600 bg-slate-900 py-3 pr-4 pl-11 text-white placeholder-gray-400 transition focus:border-cyan-500 focus:outline-none"
-								disabled={isSearching}
-								onChange={(e) => setSearchQuery(e.target.value)}
-								placeholder="영화 제목을 입력하세요 (한글 또는 영어)"
-								type="text"
-								value={searchQuery}
-							/>
-						</div>
-						<button
-							className="rounded-lg bg-cyan-500 px-6 py-3 font-semibold text-white transition hover:bg-cyan-600 disabled:cursor-not-allowed disabled:opacity-50"
-							disabled={isSearching}
-							type="submit"
-						>
-							{isSearching ? "검색중..." : "검색"}
-						</button>
-					</form>
-
-					{error && (
-						<div className="mt-4 rounded-lg border border-red-500/50 bg-red-500/10 p-4">
-							<p className="text-red-400">{error}</p>
-						</div>
+					{isSignedIn && user && (
+						<p className="mt-2 text-cyan-400 text-sm">
+							로그인됨:{" "}
+							{user.fullName || user.primaryEmailAddress?.emailAddress}
+						</p>
 					)}
 				</div>
 
+				{/* Authentication Gate */}
+				{!isSignedIn && (
+					<div className="mb-8 rounded-xl border border-yellow-500/50 bg-yellow-500/10 p-8 text-center backdrop-blur-sm">
+						<LogIn className="mx-auto mb-4 h-16 w-16 text-yellow-400" />
+						<h2 className="mb-2 font-semibold text-2xl text-white">
+							로그인이 필요합니다
+						</h2>
+						<p className="mb-6 text-gray-400">
+							영화를 추가하려면 먼저 로그인해주세요
+						</p>
+						<SignInButton mode="modal">
+							<button
+								className="rounded-lg bg-cyan-500 px-8 py-3 font-semibold text-white transition hover:bg-cyan-600"
+								type="button"
+							>
+								로그인하기
+							</button>
+						</SignInButton>
+					</div>
+				)}
+
+				{/* Search Form */}
+				{isSignedIn && (
+					<div className="mb-8 rounded-xl border border-slate-700 bg-slate-800/50 p-6 backdrop-blur-sm">
+						<form className="flex gap-3" onSubmit={handleSearch}>
+							<div className="relative flex-1">
+								<Search className="absolute top-3 left-3 h-5 w-5 text-gray-400" />
+								<input
+									className="w-full rounded-lg border border-slate-600 bg-slate-900 py-3 pr-4 pl-11 text-white placeholder-gray-400 transition focus:border-cyan-500 focus:outline-none"
+									disabled={isSearching}
+									onChange={(e) => setSearchQuery(e.target.value)}
+									placeholder="영화 제목을 입력하세요 (한글 또는 영어)"
+									type="text"
+									value={searchQuery}
+								/>
+							</div>
+							<button
+								className="rounded-lg bg-cyan-500 px-6 py-3 font-semibold text-white transition hover:bg-cyan-600 disabled:cursor-not-allowed disabled:opacity-50"
+								disabled={isSearching}
+								type="submit"
+							>
+								{isSearching ? "검색중..." : "검색"}
+							</button>
+						</form>
+
+						{error && (
+							<div className="mt-4 rounded-lg border border-red-500/50 bg-red-500/10 p-4">
+								<p className="text-red-400">{error}</p>
+							</div>
+						)}
+					</div>
+				)}
+
 				{/* Search Results */}
-				{searchResults.length > 0 && !selectedMovie && (
+				{isSignedIn && searchResults.length > 0 && !selectedMovie && (
 					<div className="mb-8">
 						<h2 className="mb-4 font-semibold text-2xl text-white">
 							검색 결과 ({searchResults.length}개)
@@ -234,7 +265,7 @@ function AddMoviePage() {
 				)}
 
 				{/* Selected Movie Form */}
-				{selectedMovie && (
+				{isSignedIn && selectedMovie && (
 					<div className="rounded-xl border border-slate-700 bg-slate-800/50 p-6 backdrop-blur-sm">
 						<div className="mb-6">
 							<h3 className="mb-2 font-bold text-2xl text-white">
@@ -307,17 +338,20 @@ function AddMoviePage() {
 				)}
 
 				{/* Empty State */}
-				{searchResults.length === 0 && !selectedMovie && !error && (
-					<div className="rounded-xl border border-slate-700 bg-slate-800/50 p-12 text-center backdrop-blur-sm">
-						<Film className="mx-auto mb-4 h-16 w-16 text-gray-600" />
-						<p className="mb-2 text-gray-400">
-							영화 제목을 검색하여 데이터베이스에 추가하세요
-						</p>
-						<p className="text-gray-500 text-sm">
-							영화진흥위원회(KOBIS) 데이터를 사용합니다
-						</p>
-					</div>
-				)}
+				{isSignedIn &&
+					searchResults.length === 0 &&
+					!selectedMovie &&
+					!error && (
+						<div className="rounded-xl border border-slate-700 bg-slate-800/50 p-12 text-center backdrop-blur-sm">
+							<Film className="mx-auto mb-4 h-16 w-16 text-gray-600" />
+							<p className="mb-2 text-gray-400">
+								영화 제목을 검색하여 데이터베이스에 추가하세요
+							</p>
+							<p className="text-gray-500 text-sm">
+								영화진흥위원회(KOBIS) 데이터를 사용합니다
+							</p>
+						</div>
+					)}
 			</div>
 		</div>
 	);

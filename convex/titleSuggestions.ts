@@ -1,21 +1,44 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
+/**
+ * Add a title suggestion (requires authentication)
+ */
 export const addSuggestion = mutation({
 	args: {
 		movieId: v.id("movies"),
 		title: v.string(),
 		description: v.optional(v.string()),
-		userId: v.optional(v.id("users")),
 	},
 	handler: async (ctx, args) => {
+		// Check authentication
+		const identity = await ctx.auth.getUserIdentity();
+		if (!identity) {
+			throw new Error("You must be logged in to add title suggestions");
+		}
+
+		// Get or create user
+		const user = await ctx.db
+			.query("users")
+			.withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+			.first();
+
+		const userId = user
+			? user._id
+			: await ctx.db.insert("users", {
+					clerkId: identity.subject,
+					email: identity.email,
+					name: identity.name,
+					createdAt: Date.now(),
+				});
+
 		const suggestionId = await ctx.db.insert("titleSuggestions", {
 			movieId: args.movieId,
 			title: args.title,
 			description: args.description,
 			votesCount: 0,
 			createdAt: Date.now(),
-			createdBy: args.userId,
+			createdBy: userId,
 		});
 		return suggestionId;
 	},
@@ -32,10 +55,12 @@ export const getSuggestionsByMovie = query({
 	},
 });
 
+const DEFAULT_TOP_SUGGESTIONS_LIMIT = 3;
+
 export const getTopSuggestions = query({
 	args: { movieId: v.id("movies"), limit: v.optional(v.number()) },
 	handler: async (ctx, args) => {
-		const limit = args.limit ?? 3;
+		const limit = args.limit ?? DEFAULT_TOP_SUGGESTIONS_LIMIT;
 		const suggestions = await ctx.db
 			.query("titleSuggestions")
 			.withIndex("by_votes", (q) => q.eq("movieId", args.movieId))
@@ -45,28 +70,51 @@ export const getTopSuggestions = query({
 	},
 });
 
+/**
+ * Vote for a suggestion (requires authentication)
+ */
 export const voteForSuggestion = mutation({
 	args: {
 		suggestionId: v.id("titleSuggestions"),
-		userId: v.id("users"),
 	},
 	handler: async (ctx, args) => {
+		// Check authentication
+		const identity = await ctx.auth.getUserIdentity();
+		if (!identity) {
+			throw new Error("You must be logged in to vote");
+		}
+
+		// Get or create user
+		const user = await ctx.db
+			.query("users")
+			.withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+			.first();
+
+		const userId = user
+			? user._id
+			: await ctx.db.insert("users", {
+					clerkId: identity.subject,
+					email: identity.email,
+					name: identity.name,
+					createdAt: Date.now(),
+				});
+
 		// Check if user already voted
 		const existingVote = await ctx.db
 			.query("votes")
 			.withIndex("by_suggestion_and_user", (q) =>
-				q.eq("suggestionId", args.suggestionId).eq("userId", args.userId)
+				q.eq("suggestionId", args.suggestionId).eq("userId", userId)
 			)
 			.first();
 
 		if (existingVote) {
-			throw new Error("User already voted for this suggestion");
+			throw new Error("You have already voted for this suggestion");
 		}
 
 		// Add vote
 		await ctx.db.insert("votes", {
 			suggestionId: args.suggestionId,
-			userId: args.userId,
+			userId,
 			createdAt: Date.now(),
 		});
 

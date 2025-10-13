@@ -131,6 +131,7 @@ export const incrementViewCount = mutation({
 
 /**
  * Create a movie from KOBIS data with auto-generated shortId
+ * Requires authentication
  */
 export const addMovieFromKobis = action({
 	args: {
@@ -138,6 +139,15 @@ export const addMovieFromKobis = action({
 		posterUrl: v.optional(v.string()),
 	},
 	handler: async (ctx, args): Promise<{ movieId: string; shortId: string }> => {
+		// Check authentication
+		const identity = await ctx.auth.getUserIdentity();
+		if (!identity) {
+			throw new Error("You must be logged in to add movies");
+		}
+
+		// Sync user to database
+		await ctx.runMutation(api.users.syncUser, {});
+
 		// Fetch movie data from KOBIS API
 		const kobisData = await ctx.runAction(api.kobis.getMovieInfo, {
 			movieCd: args.movieCd,
