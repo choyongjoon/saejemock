@@ -14,7 +14,9 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as movies from "../movies.js";
+import type * as omdb from "../omdb.js";
 import type * as seedMovies from "../seedMovies.js";
+import type * as shortId from "../shortId.js";
 import type * as titleSuggestions from "../titleSuggestions.js";
 import type * as todos from "../todos.js";
 
@@ -28,7 +30,9 @@ import type * as todos from "../todos.js";
  */
 declare const fullApi: ApiFromModules<{
   movies: typeof movies;
+  omdb: typeof omdb;
   seedMovies: typeof seedMovies;
+  shortId: typeof shortId;
   titleSuggestions: typeof titleSuggestions;
   todos: typeof todos;
 }>;

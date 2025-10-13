@@ -28,7 +28,6 @@ export const seedOneBattleAfterAnother = mutation({
 				"https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop",
 			imdbId: "tt0000000",
 			imdbUrl: "https://www.imdb.com/title/tt0000000/",
-			watchaPediaUrl: "https://pedia.watcha.com/",
 			viewCount: 42,
 			createdAt: Date.now(),
 		});

@@ -18,7 +18,6 @@ export default defineSchema({
 		posterUrl: v.optional(v.string()),
 		imdbId: v.optional(v.string()),
 		imdbUrl: v.optional(v.string()),
-		watchaPediaUrl: v.optional(v.string()),
 		viewCount: v.number(),
 		createdAt: v.number(),
 	})

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MovieAddRouteImport } from './routes/movie/add'
 import { Route as MovieShortIdRouteImport } from './routes/movie/$shortId'
 import { Route as DemoConvexRouteImport } from './routes/demo/convex'
 import { Route as DemoClerkRouteImport } from './routes/demo/clerk'
@@ -24,6 +25,11 @@ import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ss
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MovieAddRoute = MovieAddRouteImport.update({
+  id: '/movie/add',
+  path: '/movie/add',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MovieShortIdRoute = MovieShortIdRouteImport.update({
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/demo/clerk': typeof DemoClerkRoute
   '/demo/convex': typeof DemoConvexRoute
   '/movie/$shortId': typeof MovieShortIdRoute
+  '/movie/add': typeof MovieAddRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/demo/clerk': typeof DemoClerkRoute
   '/demo/convex': typeof DemoConvexRoute
   '/movie/$shortId': typeof MovieShortIdRoute
+  '/movie/add': typeof MovieAddRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/demo/clerk': typeof DemoClerkRoute
   '/demo/convex': typeof DemoConvexRoute
   '/movie/$shortId': typeof MovieShortIdRoute
+  '/movie/add': typeof MovieAddRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/demo/clerk'
     | '/demo/convex'
     | '/movie/$shortId'
+    | '/movie/add'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/demo/clerk'
     | '/demo/convex'
     | '/movie/$shortId'
+    | '/movie/add'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/demo/clerk'
     | '/demo/convex'
     | '/movie/$shortId'
+    | '/movie/add'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
@@ -164,6 +176,7 @@ export interface RootRouteChildren {
   DemoClerkRoute: typeof DemoClerkRoute
   DemoConvexRoute: typeof DemoConvexRoute
   MovieShortIdRoute: typeof MovieShortIdRoute
+  MovieAddRoute: typeof MovieAddRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
@@ -180,6 +193,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/movie/add': {
+      id: '/movie/add'
+      path: '/movie/add'
+      fullPath: '/movie/add'
+      preLoaderRoute: typeof MovieAddRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/movie/$shortId': {
@@ -260,6 +280,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoClerkRoute: DemoClerkRoute,
   DemoConvexRoute: DemoConvexRoute,
   MovieShortIdRoute: MovieShortIdRoute,
+  MovieAddRoute: MovieAddRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,

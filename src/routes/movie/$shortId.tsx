@@ -50,7 +50,9 @@ function MoviePage() {
 							<img
 								alt={movie.originalTitle}
 								className="w-full rounded-lg shadow-lg"
+								height="450"
 								src={movie.posterUrl}
+								width="300"
 							/>
 						) : (
 							<div className="flex aspect-[2/3] w-full items-center justify-center rounded-lg bg-gray-200">
@@ -68,10 +70,10 @@ function MoviePage() {
 							</h2>
 						)}
 
-						<div className="mb-6 flex gap-4">
+						<div className="mb-6 flex flex-wrap gap-3">
 							{movie.imdbUrl && (
 								<a
-									className="rounded bg-yellow-500 px-4 py-2 text-white transition hover:bg-yellow-600"
+									className="rounded-lg bg-yellow-500 px-4 py-2 font-medium text-white shadow transition hover:bg-yellow-600"
 									href={movie.imdbUrl}
 									rel="noopener noreferrer"
 									target="_blank"
@@ -79,16 +81,14 @@ function MoviePage() {
 									IMDb
 								</a>
 							)}
-							{movie.watchaPediaUrl && (
-								<a
-									className="rounded bg-purple-500 px-4 py-2 text-white transition hover:bg-purple-600"
-									href={movie.watchaPediaUrl}
-									rel="noopener noreferrer"
-									target="_blank"
-								>
-									왓챠피디아
-								</a>
-							)}
+							<a
+								className="rounded-lg bg-blue-500 px-4 py-2 font-medium text-white shadow transition hover:bg-blue-600"
+								href="https://www.kobis.or.kr/kobis/business/mast/mvie/searchMovieList.do"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								영화진흥위원회 (한국 공식 제목)
+							</a>
 						</div>
 
 						{/* Title Suggestions Section */}
@@ -119,7 +119,8 @@ function TitleSuggestions({ suggestions }: { suggestions: TitleSuggestion[] }) {
 	}
 
 	// Show top 3 suggestions
-	const topSuggestions = suggestions.slice(0, 3);
+	const TOP_SUGGESTIONS_COUNT = 3;
+	const topSuggestions = suggestions.slice(0, TOP_SUGGESTIONS_COUNT);
 
 	return (
 		<div className="space-y-4">
