@@ -12,8 +12,11 @@ import type {
   ApiFromModules,
   FilterApi,
   FunctionReference,
-} from 'convex/server'
-import type * as todos from '../todos.js'
+} from "convex/server";
+import type * as movies from "../movies.js";
+import type * as seedMovies from "../seedMovies.js";
+import type * as titleSuggestions from "../titleSuggestions.js";
+import type * as todos from "../todos.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -24,13 +27,16 @@ import type * as todos from '../todos.js'
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  todos: typeof todos
-}>
+  movies: typeof movies;
+  seedMovies: typeof seedMovies;
+  titleSuggestions: typeof titleSuggestions;
+  todos: typeof todos;
+}>;
 export declare const api: FilterApi<
   typeof fullApi,
-  FunctionReference<any, 'public'>
->
+  FunctionReference<any, "public">
+>;
 export declare const internal: FilterApi<
   typeof fullApi,
-  FunctionReference<any, 'internal'>
->
+  FunctionReference<any, "internal">
+>;

@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMutation, useQuery } from "convex/react";
 import {
 	Route as RouteIcon,
 	Server,
@@ -8,6 +8,7 @@ import {
 	Waves,
 	Zap,
 } from "lucide-react";
+import { api } from "../../convex/_generated/api";
 
 export const Route = createFileRoute("/")({
 	component: App,
@@ -111,6 +112,122 @@ function App() {
 					))}
 				</div>
 			</section>
+
+			<section className="mx-auto max-w-7xl px-6 py-16">
+				<h2 className="mb-8 text-center font-bold text-3xl text-white">
+					영화 제목 번역 제안
+				</h2>
+				<MoviesSection />
+			</section>
+		</div>
+	);
+}
+
+function MoviesSection() {
+	const moviesByViews = useQuery(api.movies.getMoviesByViewCount, { limit: 6 });
+	const recentMovies = useQuery(api.movies.getMoviesByCreatedAt, { limit: 6 });
+	const seedMovie = useMutation(api.seedMovies.seedOneBattleAfterAnother);
+
+	const handleSeedMovie = async () => {
+		try {
+			const result = await seedMovie({});
+			if (result.success) {
+				alert("Sample movie added successfully!");
+			} else {
+				alert(result.message);
+			}
+		} catch (error) {
+			console.error("Error seeding movie:", error);
+			alert("Failed to add sample movie");
+		}
+	};
+
+	if (moviesByViews === undefined || recentMovies === undefined) {
+		return (
+			<div className="text-center text-gray-400">
+				영화 목록을 불러오는 중...
+			</div>
+		);
+	}
+
+	return (
+		<div className="space-y-12">
+			{/* Seed Button */}
+			<div className="text-center">
+				<button
+					className="rounded-lg bg-purple-500 px-6 py-3 font-semibold text-white shadow-lg shadow-purple-500/50 transition-colors hover:bg-purple-600"
+					onClick={handleSeedMovie}
+					type="button"
+				>
+					샘플 영화 추가하기
+				</button>
+			</div>
+
+			{/* Most Viewed */}
+			<div>
+				<h3 className="mb-4 font-semibold text-2xl text-white">
+					조회수 순 영화
+				</h3>
+				{moviesByViews.length === 0 ? (
+					<p className="text-center text-gray-400">아직 영화가 없습니다.</p>
+				) : (
+					<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+						{moviesByViews.map((movie) => (
+							<Link
+								className="rounded-lg border border-slate-700 bg-slate-800/50 p-4 backdrop-blur-sm transition-all hover:border-cyan-500/50 hover:shadow-cyan-500/10 hover:shadow-lg"
+								key={movie._id}
+								params={{ shortId: movie.shortId }}
+								to="/movie/$shortId"
+							>
+								<h4 className="mb-2 font-semibold text-lg text-white">
+									{movie.originalTitle}
+								</h4>
+								{movie.koreanTitle && (
+									<p className="mb-2 text-gray-400 text-sm">
+										{movie.koreanTitle}
+									</p>
+								)}
+								<p className="text-gray-500 text-sm">
+									조회수: {movie.viewCount.toLocaleString()}회
+								</p>
+							</Link>
+						))}
+					</div>
+				)}
+			</div>
+
+			{/* Recently Added */}
+			<div>
+				<h3 className="mb-4 font-semibold text-2xl text-white">
+					신규 추가 영화
+				</h3>
+				{recentMovies.length === 0 ? (
+					<p className="text-center text-gray-400">아직 영화가 없습니다.</p>
+				) : (
+					<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+						{recentMovies.map((movie) => (
+							<Link
+								className="rounded-lg border border-slate-700 bg-slate-800/50 p-4 backdrop-blur-sm transition-all hover:border-cyan-500/50 hover:shadow-cyan-500/10 hover:shadow-lg"
+								key={movie._id}
+								params={{ shortId: movie.shortId }}
+								to="/movie/$shortId"
+							>
+								<h4 className="mb-2 font-semibold text-lg text-white">
+									{movie.originalTitle}
+								</h4>
+								{movie.koreanTitle && (
+									<p className="mb-2 text-gray-400 text-sm">
+										{movie.koreanTitle}
+									</p>
+								)}
+								<p className="text-gray-500 text-sm">
+									{new Date(movie.createdAt).toLocaleDateString("ko-KR")}
+								</p>
+							</Link>
+						))}
+					</div>
+				)}
+			</div>
 		</div>
 	);
 }
