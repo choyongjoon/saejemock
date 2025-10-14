@@ -17,7 +17,7 @@ function HomePage() {
 						<h1 className="mb-4 font-bold text-5xl">새 제목</h1>
 						<p className="mb-8 text-xl">맘에 안 드는 영화 제목을 고쳐보세요.</p>
 						<Link className="btn btn-primary btn-lg" to="/movie/add">
-							+ 영화 추가하기
+							영화 찾기
 						</Link>
 					</div>
 				</div>
@@ -75,7 +75,7 @@ function MoviesSection() {
 					<div className="mb-6 flex items-center gap-3">
 						<h2 className="font-bold text-3xl">투표가 많은 영화</h2>
 					</div>
-					<div className="grid grid-cols-3 gap-2">
+					<div className="grid grid-cols-1 gap-2">
 						{moviesByVotes.map((movie: MovieWithVotes) => (
 							<MovieCard key={movie._id} movie={movie} />
 						))}
@@ -89,7 +89,7 @@ function MoviesSection() {
 					<div className="mb-6 flex items-center gap-3">
 						<h2 className="font-bold text-3xl">조회수가 높은 영화</h2>
 					</div>
-					<div className="grid grid-cols-3 gap-2">
+					<div className="grid grid-cols-1 gap-2">
 						{moviesByViews.map((movie: Movie) => (
 							<MovieCard key={movie._id} movie={movie} />
 						))}
@@ -103,7 +103,7 @@ function MoviesSection() {
 					<div className="mb-6 flex items-center gap-3">
 						<h2 className="font-bold text-3xl">신규 추가 영화</h2>
 					</div>
-					<div className="grid grid-cols-3 gap-2">
+					<div className="grid grid-cols-1 gap-2">
 						{recentMovies.map((movie: Movie) => (
 							<MovieCard key={movie._id} movie={movie} />
 						))}

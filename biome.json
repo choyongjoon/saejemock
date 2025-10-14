@@ -31,7 +31,8 @@
     "rules": {
       "recommended": true,
       "correctness": {
-        "noUnknownProperty": "off"
+        "noUnknownProperty": "off",
+        "noUnknownTypeSelector": "off"
       },
       "performance": {
         "noImgElement": "off"

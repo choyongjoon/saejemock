@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { Calendar } from "lucide-react";
 
 type Movie = {
 	_id: string;
@@ -51,23 +50,18 @@ export default function MovieCard({ movie }: MovieCardProps) {
 			{/* Content */}
 			<div className="card-body">
 				{/* Korean Title (Main) */}
-				<h3 className="card-title line-clamp-2 text-base">
+				<h3 className="card-title line-clamp-2">
 					{movie.koreanTitle || movie.originalTitle}
 				</h3>
 
 				{/* Original Title (Subtitle) - only show if different from Korean title */}
 				{movie.koreanTitle && (
-					<p className="line-clamp-2 text-sm opacity-60">
-						{movie.originalTitle}
-					</p>
+					<p className="line-clamp-2 opacity-80">{movie.originalTitle}</p>
 				)}
 
 				{/* Release Date */}
 				{formattedDate && (
-					<div className="flex items-center gap-1 text-sm opacity-50">
-						<Calendar className="h-4 w-4" />
-						<span>{formattedDate}</span>
-					</div>
+					<span className="text-right opacity-50">{formattedDate}</span>
 				)}
 			</div>
 		</Link>

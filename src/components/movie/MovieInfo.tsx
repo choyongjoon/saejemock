@@ -53,17 +53,17 @@ export function MovieInfo({
 
 	return (
 		<div>
-			<h1 className="mb-2 font-bold text-3xl">{originalTitle}</h1>
+			<h1 className="mb-2 font-bold text-3xl">{koreanTitle}</h1>
 			{koreanTitle && (
-				<h2 className="mb-2 text-gray-600 text-xl">{koreanTitle}</h2>
+				<h2 className="mb-2 text-xl opacity-80">{originalTitle}</h2>
 			)}
 			{formattedDate && (
-				<p className="mb-6 text-gray-500 text-sm">개봉일: {formattedDate}</p>
+				<p className="mb-6 text-sm opacity-50">개봉일: {formattedDate}</p>
 			)}
 
 			{/* Title Suggestions Section */}
-			<div>
-				<h3 className="mb-4 font-bold text-2xl">제목 제안</h3>
+			<div className="mt-12">
+				<h3 className="font-bold text-2xl">제목 제안</h3>
 				<TitleSuggestions suggestions={titleSuggestions} />
 			</div>
 		</div>

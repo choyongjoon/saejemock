@@ -94,7 +94,105 @@ export const getTopSuggestions = query({
 });
 
 /**
+ * Get user's vote for a movie (returns the suggestion they voted for)
+ */
+export const getUserVoteForMovie = query({
+	args: {
+		movieId: v.id("movies"),
+	},
+	handler: async (ctx, args) => {
+		// Check authentication
+		const identity = await ctx.auth.getUserIdentity();
+		if (!identity) {
+			return null;
+		}
+
+		// Get user
+		const user = await ctx.db
+			.query("users")
+			.withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+			.first();
+
+		if (!user) {
+			return null;
+		}
+
+		// Get all suggestions for this movie
+		const suggestions = await ctx.db
+			.query("titleSuggestions")
+			.withIndex("by_movie", (q) => q.eq("movieId", args.movieId))
+			.collect();
+
+		// Check if user voted for any suggestion in this movie
+		for (const suggestion of suggestions) {
+			const vote = await ctx.db
+				.query("votes")
+				.withIndex("by_suggestion_and_user", (q) =>
+					q.eq("suggestionId", suggestion._id).eq("userId", user._id)
+				)
+				.first();
+
+			if (vote) {
+				return { suggestionId: suggestion._id, voteId: vote._id };
+			}
+		}
+
+		return null;
+	},
+});
+
+/**
+ * Cancel a vote (requires authentication)
+ */
+export const cancelVote = mutation({
+	args: {
+		suggestionId: v.id("titleSuggestions"),
+	},
+	handler: async (ctx, args) => {
+		// Check authentication
+		const identity = await ctx.auth.getUserIdentity();
+		if (!identity) {
+			throw new Error("You must be logged in to cancel vote");
+		}
+
+		// Get user
+		const user = await ctx.db
+			.query("users")
+			.withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+			.first();
+
+		if (!user) {
+			throw new Error("User not found");
+		}
+
+		// Find the vote
+		const vote = await ctx.db
+			.query("votes")
+			.withIndex("by_suggestion_and_user", (q) =>
+				q.eq("suggestionId", args.suggestionId).eq("userId", user._id)
+			)
+			.first();
+
+		if (!vote) {
+			throw new Error("Vote not found");
+		}
+
+		// Delete the vote
+		await ctx.db.delete(vote._id);
+
+		// Decrement vote count
+		const suggestion = await ctx.db.get(args.suggestionId);
+		if (suggestion) {
+			await ctx.db.patch(args.suggestionId, {
+				votesCount: Math.max(0, suggestion.votesCount - 1),
+			});
+		}
+	},
+});
+
+/**
  * Vote for a suggestion (requires authentication)
+ * Only one vote per movie is allowed
  */
 export const voteForSuggestion = mutation({
 	args: {
@@ -122,16 +220,29 @@ export const voteForSuggestion = mutation({
 					createdAt: Date.now(),
 				});
 
-		// Check if user already voted
-		const existingVote = await ctx.db
-			.query("votes")
-			.withIndex("by_suggestion_and_user", (q) =>
-				q.eq("suggestionId", args.suggestionId).eq("userId", userId)
-			)
-			.first();
+		// Get the suggestion to find the movie
+		const suggestion = await ctx.db.get(args.suggestionId);
+		if (!suggestion) {
+			throw new Error("Suggestion not found");
+		}
 
-		if (existingVote) {
-			throw new Error("You have already voted for this suggestion");
+		// Check if user already voted for ANY suggestion in this movie
+		const allSuggestions = await ctx.db
+			.query("titleSuggestions")
+			.withIndex("by_movie", (q) => q.eq("movieId", suggestion.movieId))
+			.collect();
+
+		for (const s of allSuggestions) {
+			const existingVote = await ctx.db
+				.query("votes")
+				.withIndex("by_suggestion_and_user", (q) =>
+					q.eq("suggestionId", s._id).eq("userId", userId)
+				)
+				.first();
+
+			if (existingVote) {
+				throw new Error("You can only vote for one suggestion per movie");
+			}
 		}
 
 		// Add vote
@@ -142,10 +253,6 @@ export const voteForSuggestion = mutation({
 		});
 
 		// Increment vote count
-		const suggestion = await ctx.db.get(args.suggestionId);
-		if (!suggestion) {
-			throw new Error("Suggestion not found");
-		}
 		await ctx.db.patch(args.suggestionId, {
 			votesCount: suggestion.votesCount + 1,
 		});

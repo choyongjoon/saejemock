@@ -1,6 +1,7 @@
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
+import { useViewTransition } from "../../hooks/useViewTransition";
 import { AddSuggestionForm } from "./AddSuggestionForm";
 import { TitleSuggestionCard } from "./TitleSuggestionCard";
 
@@ -24,17 +25,37 @@ const TOP_SUGGESTIONS_COUNT = 3;
 
 export function TitleSuggestions({ suggestions }: TitleSuggestionsProps) {
 	const voteForSuggestion = useMutation(api.titleSuggestions.voteForSuggestion);
+	const cancelVote = useMutation(api.titleSuggestions.cancelVote);
 	const addSuggestion = useMutation(api.titleSuggestions.addSuggestion);
+	const { startTransition } = useViewTransition();
 
 	// Get movie ID from the first suggestion
 	const movieId = suggestions[0]?.movieId;
 
-	const handleVote = async (suggestionId: Id<"titleSuggestions">) => {
-		try {
-			await voteForSuggestion({ suggestionId });
-		} catch {
-			// Error handled silently
-		}
+	// Get user's vote for this movie
+	const userVote = useQuery(
+		api.titleSuggestions.getUserVoteForMovie,
+		movieId ? { movieId } : "skip"
+	);
+
+	const handleVote = (suggestionId: Id<"titleSuggestions">) => {
+		startTransition(async () => {
+			try {
+				await voteForSuggestion({ suggestionId });
+			} catch (error) {
+				console.error("Vote failed:", error);
+			}
+		});
+	};
+
+	const handleCancelVote = (suggestionId: Id<"titleSuggestions">) => {
+		startTransition(async () => {
+			try {
+				await cancelVote({ suggestionId });
+			} catch (error) {
+				console.error("Cancel vote failed:", error);
+			}
+		});
 	};
 
 	const handleAddSuggestion = async (title: string, description?: string) => {
@@ -51,17 +72,20 @@ export function TitleSuggestions({ suggestions }: TitleSuggestionsProps) {
 	const topSuggestions = suggestions.slice(0, TOP_SUGGESTIONS_COUNT);
 
 	return (
-		<div className="space-y-4">
+		<ul className="list">
 			{topSuggestions.map((suggestion, index) => (
 				<TitleSuggestionCard
+					hasVoted={userVote?.suggestionId === suggestion._id}
 					index={index}
 					key={suggestion._id}
+					onCancelVote={handleCancelVote}
 					onVote={handleVote}
 					suggestion={suggestion}
+					userHasVotedInMovie={userVote !== null && userVote !== undefined}
 				/>
 			))}
 
 			<AddSuggestionForm onSubmit={handleAddSuggestion} />
-		</div>
+		</ul>
 	);
 }

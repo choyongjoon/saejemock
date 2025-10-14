@@ -5,7 +5,7 @@ import {
 	UserButton,
 } from "@clerk/clerk-react";
 import { Link } from "@tanstack/react-router";
-import { Film, Plus } from "lucide-react";
+import { Film } from "lucide-react";
 
 export default function Header() {
 	return (
@@ -18,8 +18,7 @@ export default function Header() {
 
 			<div className="navbar-end gap-2">
 				<Link className="btn btn-primary btn-sm" to="/movie/add">
-					<Plus className="h-4 w-4" />
-					영화 추가
+					영화 찾기
 				</Link>
 
 				<SignedIn>
