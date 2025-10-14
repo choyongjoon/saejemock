@@ -27,10 +27,14 @@ export function TitleSuggestions({ suggestions }: TitleSuggestionsProps) {
 	const voteForSuggestion = useMutation(api.titleSuggestions.voteForSuggestion);
 	const cancelVote = useMutation(api.titleSuggestions.cancelVote);
 	const addSuggestion = useMutation(api.titleSuggestions.addSuggestion);
+	const deleteSuggestion = useMutation(api.titleSuggestions.deleteSuggestion);
 	const { startTransition } = useViewTransition();
 
 	// Get movie ID from the first suggestion
 	const movieId = suggestions[0]?.movieId;
+
+	// Get current user
+	const currentUser = useQuery(api.users.current);
 
 	// Get user's vote for this movie
 	const userVote = useQuery(
@@ -58,6 +62,16 @@ export function TitleSuggestions({ suggestions }: TitleSuggestionsProps) {
 		});
 	};
 
+	const handleDelete = (suggestionId: Id<"titleSuggestions">) => {
+		startTransition(async () => {
+			try {
+				await deleteSuggestion({ suggestionId });
+			} catch (error) {
+				console.error("Delete failed:", error);
+			}
+		});
+	};
+
 	const handleAddSuggestion = async (title: string, description?: string) => {
 		if (!movieId) {
 			return;
@@ -75,10 +89,12 @@ export function TitleSuggestions({ suggestions }: TitleSuggestionsProps) {
 		<ul className="list">
 			{topSuggestions.map((suggestion, index) => (
 				<TitleSuggestionCard
+					currentUserId={currentUser?._id}
 					hasVoted={userVote?.suggestionId === suggestion._id}
 					index={index}
 					key={suggestion._id}
 					onCancelVote={handleCancelVote}
+					onDelete={handleDelete}
 					onVote={handleVote}
 					suggestion={suggestion}
 					userHasVotedInMovie={userVote !== null && userVote !== undefined}

@@ -142,6 +142,75 @@ export const getUserVoteForMovie = query({
 });
 
 /**
+ * Delete a suggestion (requires authentication and creator ownership)
+ */
+export const deleteSuggestion = mutation({
+	args: {
+		suggestionId: v.id("titleSuggestions"),
+	},
+	handler: async (ctx, args) => {
+		// Check authentication
+		const identity = await ctx.auth.getUserIdentity();
+		if (!identity) {
+			throw new Error("You must be logged in to delete suggestions");
+		}
+
+		// Get user
+		const user = await ctx.db
+			.query("users")
+			.withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+			.first();
+
+		if (!user) {
+			throw new Error("User not found");
+		}
+
+		// Get the suggestion
+		const suggestion = await ctx.db.get(args.suggestionId);
+		if (!suggestion) {
+			throw new Error("Suggestion not found");
+		}
+
+		// Check if user is the creator
+		if (suggestion.createdBy !== user._id) {
+			throw new Error("You can only delete your own suggestions");
+		}
+
+		// Don't allow deleting official suggestions
+		if (suggestion.isOfficial) {
+			throw new Error("Cannot delete official suggestions");
+		}
+
+		// Delete all votes for this suggestion
+		const votes = await ctx.db
+			.query("votes")
+			.withIndex("by_suggestion", (q) =>
+				q.eq("suggestionId", args.suggestionId)
+			)
+			.collect();
+
+		for (const vote of votes) {
+			await ctx.db.delete(vote._id);
+		}
+
+		// Delete all comments for this suggestion
+		const comments = await ctx.db
+			.query("comments")
+			.withIndex("by_suggestion", (q) =>
+				q.eq("suggestionId", args.suggestionId)
+			)
+			.collect();
+
+		for (const comment of comments) {
+			await ctx.db.delete(comment._id);
+		}
+
+		// Delete the suggestion
+		await ctx.db.delete(args.suggestionId);
+	},
+});
+
+/**
  * Cancel a vote (requires authentication)
  */
 export const cancelVote = mutation({
