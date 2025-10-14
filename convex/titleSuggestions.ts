@@ -39,6 +39,29 @@ export const addSuggestion = mutation({
 			votesCount: 0,
 			createdAt: Date.now(),
 			createdBy: userId,
+			isOfficial: false,
+		});
+		return suggestionId;
+	},
+});
+
+/**
+ * Add an official title suggestion (internal use, no authentication required)
+ */
+export const addOfficialSuggestion = mutation({
+	args: {
+		movieId: v.id("movies"),
+		title: v.string(),
+		description: v.optional(v.string()),
+	},
+	handler: async (ctx, args) => {
+		const suggestionId = await ctx.db.insert("titleSuggestions", {
+			movieId: args.movieId,
+			title: args.title,
+			description: args.description,
+			votesCount: 0,
+			createdAt: Date.now(),
+			isOfficial: true,
 		});
 		return suggestionId;
 	},

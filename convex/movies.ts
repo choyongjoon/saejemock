@@ -171,7 +171,7 @@ export const addMovieFromKobis = action({
 		}
 
 		// Create movie with KOBIS data
-		const movieId: string = await ctx.runMutation(api.movies.addMovie, {
+		const movieId = await ctx.runMutation(api.movies.addMovie, {
 			shortId,
 			originalTitle: movieInfo.movieNmEn || movieInfo.movieNmOg,
 			koreanTitle: movieInfo.movieNm,
@@ -181,7 +181,16 @@ export const addMovieFromKobis = action({
 				"https://www.kobis.or.kr/kobis/business/mast/mvie/searchMovieList.do",
 		});
 
-		return { movieId, shortId };
+		// Create official title suggestion with Korean name
+		if (movieInfo.movieNm) {
+			await ctx.runMutation(api.titleSuggestions.addOfficialSuggestion, {
+				movieId,
+				title: movieInfo.movieNm,
+				description: "공식 한글 제목",
+			});
+		}
+
+		return { movieId: movieId.toString(), shortId };
 	},
 });
 

@@ -37,6 +37,7 @@ export default defineSchema({
 		votesCount: v.number(),
 		createdAt: v.number(),
 		createdBy: v.optional(v.id("users")),
+		isOfficial: v.optional(v.boolean()),
 	})
 		.index("by_movie", ["movieId"])
 		.index("by_votes", ["movieId", "votesCount"]),

@@ -40,7 +40,8 @@ function ConvexTodos() {
 		[removeTodo]
 	);
 
-	const completedCount = todos?.filter((todo) => todo.completed).length || 0;
+	const completedCount =
+		todos?.filter((todo: { completed: boolean }) => todo.completed).length || 0;
 	const totalCount = todos?.length || 0;
 
 	return (
@@ -114,44 +115,50 @@ function ConvexTodos() {
 							</div>
 						) : (
 							<div className="divide-y divide-green-100">
-								{todos.map((todo) => (
-									<div
-										className={`flex items-center gap-4 p-4 transition-colors hover:bg-green-50/50 ${
-											todo.completed ? "opacity-75" : ""
-										}`}
-										key={todo._id}
-									>
-										<button
-											className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200 ${
-												todo.completed
-													? "border-green-500 bg-green-500 text-white"
-													: "border-green-300 text-transparent hover:border-green-400 hover:text-green-400"
+								{todos.map(
+									(todo: {
+										_id: Id<"todos">;
+										text: string;
+										completed: boolean;
+									}) => (
+										<div
+											className={`flex items-center gap-4 p-4 transition-colors hover:bg-green-50/50 ${
+												todo.completed ? "opacity-75" : ""
 											}`}
-											onClick={() => handleToggleTodo(todo._id)}
-											type="button"
+											key={todo._id}
 										>
-											<Check size={14} />
-										</button>
+											<button
+												className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200 ${
+													todo.completed
+														? "border-green-500 bg-green-500 text-white"
+														: "border-green-300 text-transparent hover:border-green-400 hover:text-green-400"
+												}`}
+												onClick={() => handleToggleTodo(todo._id)}
+												type="button"
+											>
+												<Check size={14} />
+											</button>
 
-										<span
-											className={`flex-1 text-lg transition-all duration-200 ${
-												todo.completed
-													? "text-gray-500 line-through"
-													: "text-gray-800"
-											}`}
-										>
-											{todo.text}
-										</span>
+											<span
+												className={`flex-1 text-lg transition-all duration-200 ${
+													todo.completed
+														? "text-gray-500 line-through"
+														: "text-gray-800"
+												}`}
+											>
+												{todo.text}
+											</span>
 
-										<button
-											className="flex-shrink-0 rounded-lg p-2 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600"
-											onClick={() => handleRemoveTodo(todo._id)}
-											type="button"
-										>
-											<Trash2 size={18} />
-										</button>
-									</div>
-								))}
+											<button
+												className="flex-shrink-0 rounded-lg p-2 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600"
+												onClick={() => handleRemoveTodo(todo._id)}
+												type="button"
+											>
+												<Trash2 size={18} />
+											</button>
+										</div>
+									)
+								)}
 							</div>
 						)
 					) : (
