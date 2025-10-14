@@ -17,7 +17,7 @@ export default function Header() {
 			</div>
 
 			<div className="navbar-end gap-2">
-				<Link className="btn btn-primary btn-sm" to="/movie/add">
+				<Link className="btn btn-primary btn-sm" to="/movie/search">
 					영화 찾기
 				</Link>
 

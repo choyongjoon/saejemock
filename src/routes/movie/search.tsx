@@ -1,12 +1,22 @@
-import { SignInButton, useUser } from "@clerk/clerk-react";
+import { useUser } from "@clerk/clerk-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAction, useQuery } from "convex/react";
 import { Film, Search } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { z } from "zod";
 import { api } from "../../../convex/_generated/api";
+import {
+	type MergedMovie,
+	MovieResultCard,
+} from "../../components/movie/MovieResultCard";
 
-export const Route = createFileRoute("/movie/add")({
+const movieAddSearchSchema = z.object({
+	q: z.string().optional(),
+});
+
+export const Route = createFileRoute("/movie/search")({
 	component: SearchMoviePage,
+	validateSearch: movieAddSearchSchema,
 });
 
 type KobisMovie = {
@@ -20,18 +30,6 @@ type KobisMovie = {
 	genreAlt: string;
 };
 
-type MergedMovie = {
-	source: "db" | "kobis";
-	inDB: boolean;
-	movieCd?: string;
-	shortId?: string;
-	koreanTitle: string;
-	originalTitle: string;
-	year?: string;
-	directors?: string;
-	additionalInfo?: string;
-};
-
 function useMergedResults(
 	dbResults:
 		| Array<{
@@ -41,6 +39,9 @@ function useMergedResults(
 				koreanTitle?: string;
 				releaseDate?: string;
 				kobisMovieCode?: string;
+				year?: string;
+				directors?: string;
+				additionalInfo?: string;
 		  }>
 		| undefined,
 	kobisResults: KobisMovie[]
@@ -57,6 +58,9 @@ function useMergedResults(
 				shortId: movie.shortId,
 				koreanTitle: movie.koreanTitle || movie.originalTitle,
 				originalTitle: movie.originalTitle,
+				year: movie.year,
+				directors: movie.directors,
+				additionalInfo: movie.additionalInfo,
 			});
 			// Track KOBIS codes if available
 			if (movie.kobisMovieCode) {
@@ -86,82 +90,13 @@ function useMergedResults(
 	return mergedResults;
 }
 
-function MovieResultCard({
-	movie,
-	index,
-	isAdding,
-	isSignedIn,
-	onMovieClick,
-}: {
-	movie: MergedMovie;
-	index: number;
-	isAdding: boolean;
-	isSignedIn: boolean;
-	onMovieClick: (movie: MergedMovie) => void;
-}) {
-	return (
-		<button
-			className={`card card-compact w-full bg-base-200 text-left transition-all hover:shadow-lg ${
-				isAdding ? "cursor-wait opacity-50" : ""
-			}`}
-			disabled={isAdding || !(movie.inDB || isSignedIn)}
-			key={`${movie.source}-${movie.shortId || movie.movieCd || index}`}
-			onClick={() => onMovieClick(movie)}
-			type="button"
-		>
-			<div className="card-body">
-				<div className="flex items-start justify-between gap-4">
-					<div className="flex-1">
-						<div className="mb-1 flex items-center gap-2">
-							<h3 className="card-title text-base">{movie.koreanTitle}</h3>
-							{movie.inDB ? (
-								<span className="badge badge-primary badge-sm">DB</span>
-							) : (
-								<span className="badge badge-secondary badge-sm">KOBIS</span>
-							)}
-						</div>
-						{movie.originalTitle !== movie.koreanTitle && (
-							<p className="mb-1 text-sm opacity-70">{movie.originalTitle}</p>
-						)}
-						<div className="flex flex-wrap gap-2 text-xs opacity-60">
-							{movie.year && <span>{movie.year}년</span>}
-							{movie.directors && <span>• {movie.directors}</span>}
-							{movie.additionalInfo && <span>• {movie.additionalInfo}</span>}
-						</div>
-					</div>
-
-					{!(movie.inDB || isSignedIn) && (
-						<div className="flex items-center gap-2">
-							<SignInButton mode="modal">
-								<button
-									className="btn btn-ghost btn-sm"
-									onClick={(e) => e.stopPropagation()}
-									type="button"
-								>
-									로그인 필요
-								</button>
-							</SignInButton>
-						</div>
-					)}
-					{!movie.inDB && isSignedIn && (
-						<div className="flex items-center">
-							{isAdding ? (
-								<span className="loading loading-spinner loading-sm text-primary" />
-							) : (
-								<span className="text-primary text-sm">클릭하여 추가 →</span>
-							)}
-						</div>
-					)}
-				</div>
-			</div>
-		</button>
-	);
-}
-
 function SearchMoviePage() {
 	const { isSignedIn } = useUser();
-	const [searchQuery, setSearchQuery] = useState("");
-	const [debouncedQuery, setDebouncedQuery] = useState("");
+	const navigate = useNavigate();
+	const { q } = Route.useSearch();
+
+	const [searchQuery, setSearchQuery] = useState(q || "");
+	const [debouncedQuery, setDebouncedQuery] = useState(q || "");
 	const [kobisResults, setKobisResults] = useState<KobisMovie[]>([]);
 	const [isSearchingKobis, setIsSearchingKobis] = useState(false);
 	const [isAdding, setIsAdding] = useState(false);
@@ -169,13 +104,75 @@ function SearchMoviePage() {
 
 	const searchKobis = useAction(api.kobis.searchMoviesByTitle);
 	const addMovieFromKobis = useAction(api.movies.addMovieFromKobis);
-	const navigate = useNavigate();
 
 	// Search our DB
 	const dbResults = useQuery(
 		api.movies.searchMovies,
 		debouncedQuery ? { searchQuery: debouncedQuery } : "skip"
 	);
+
+	const performSearch = useCallback(
+		async (query: string) => {
+			setDebouncedQuery(query);
+			setIsSearchingKobis(true);
+			setErrorMessage(null);
+
+			try {
+				const result = await searchKobis({ movieNm: query });
+
+				if (result?.movieListResult?.movieList) {
+					const transformedResults = result.movieListResult.movieList.map(
+						(movie: {
+							movieCd: string;
+							movieNm: string;
+							movieNmEn: string;
+							prdtYear: string;
+							openDt: string;
+							directors: Array<{ peopleNm: string }>;
+							nationAlt: string;
+							genreAlt: string;
+						}) => ({
+							movieCd: movie.movieCd,
+							movieNm: movie.movieNm,
+							movieNmEn: movie.movieNmEn,
+							prdtYear: movie.prdtYear,
+							openDt: movie.openDt,
+							directors: movie.directors
+								.map((d: { peopleNm: string }) => d.peopleNm)
+								.join(", "),
+							nationAlt: movie.nationAlt,
+							genreAlt: movie.genreAlt,
+						})
+					);
+					setKobisResults(transformedResults);
+				} else {
+					setKobisResults([]);
+					if (!result?.movieListResult) {
+						setErrorMessage(
+							"KOBIS API 응답 형식이 올바르지 않습니다. 데이터베이스 결과만 표시됩니다."
+						);
+					}
+				}
+			} catch (error) {
+				setKobisResults([]);
+				setErrorMessage(
+					error instanceof Error
+						? error.message
+						: "KOBIS 검색 중 오류가 발생했습니다. 데이터베이스 결과만 표시됩니다."
+				);
+			} finally {
+				setIsSearchingKobis(false);
+			}
+		},
+		[searchKobis]
+	);
+
+	// Trigger search on mount if query param exists
+	useEffect(() => {
+		if (q?.trim()) {
+			performSearch(q.trim());
+		}
+	}, [q, performSearch]);
 
 	const handleSearch = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -185,56 +182,13 @@ function SearchMoviePage() {
 			return;
 		}
 
-		setDebouncedQuery(query);
-		setIsSearchingKobis(true);
-		setErrorMessage(null);
+		// Update URL with search query
+		await navigate({
+			to: "/movie/search",
+			search: { q: query },
+		});
 
-		try {
-			const result = await searchKobis({ movieNm: query });
-
-			if (result?.movieListResult?.movieList) {
-				const transformedResults = result.movieListResult.movieList.map(
-					(movie: {
-						movieCd: string;
-						movieNm: string;
-						movieNmEn: string;
-						prdtYear: string;
-						openDt: string;
-						directors: Array<{ peopleNm: string }>;
-						nationAlt: string;
-						genreAlt: string;
-					}) => ({
-						movieCd: movie.movieCd,
-						movieNm: movie.movieNm,
-						movieNmEn: movie.movieNmEn,
-						prdtYear: movie.prdtYear,
-						openDt: movie.openDt,
-						directors: movie.directors
-							.map((d: { peopleNm: string }) => d.peopleNm)
-							.join(", "),
-						nationAlt: movie.nationAlt,
-						genreAlt: movie.genreAlt,
-					})
-				);
-				setKobisResults(transformedResults);
-			} else {
-				setKobisResults([]);
-				if (!result?.movieListResult) {
-					setErrorMessage(
-						"KOBIS API 응답 형식이 올바르지 않습니다. 데이터베이스 결과만 표시됩니다."
-					);
-				}
-			}
-		} catch (error) {
-			setKobisResults([]);
-			setErrorMessage(
-				error instanceof Error
-					? error.message
-					: "KOBIS 검색 중 오류가 발생했습니다. 데이터베이스 결과만 표시됩니다."
-			);
-		} finally {
-			setIsSearchingKobis(false);
-		}
+		await performSearch(query);
 	};
 
 	const handleMovieClick = async (movie: MergedMovie) => {
@@ -282,9 +236,6 @@ function SearchMoviePage() {
 						<Film className="h-12 w-12 text-primary" />
 					</div>
 					<h1 className="mb-2 font-bold text-4xl">영화 검색</h1>
-					<p className="text-base-content/70">
-						데이터베이스와 영화진흥위원회(KOBIS)에서 영화를 검색하세요
-					</p>
 				</div>
 
 				{/* Search Form */}
@@ -348,14 +299,6 @@ function SearchMoviePage() {
 							<h2 className="font-bold text-2xl">
 								검색 결과 ({mergedResults.length}개)
 							</h2>
-							<div className="flex gap-2 text-sm">
-								<span className="badge badge-primary">
-									DB: {dbResults?.length || 0}
-								</span>
-								<span className="badge badge-secondary">
-									KOBIS: {kobisResults.length}
-								</span>
-							</div>
 						</div>
 
 						<div className="space-y-2">
@@ -396,7 +339,7 @@ function SearchMoviePage() {
 								<Search className="mx-auto h-16 w-16 opacity-20" />
 								<h3 className="card-title justify-center">영화를 검색하세요</h3>
 								<p className="opacity-70">
-									우리 데이터베이스와 KOBIS에서 영화를 찾아드립니다
+									영화관입장권통합전산망 오픈 API를 사용하여 검색합니다.
 								</p>
 							</div>
 						</div>

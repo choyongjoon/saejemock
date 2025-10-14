@@ -9,6 +9,9 @@ export const addMovie = mutation({
 		koreanTitle: v.optional(v.string()),
 		releaseDate: v.optional(v.string()),
 		kobisMovieCode: v.optional(v.string()),
+		year: v.optional(v.string()),
+		directors: v.optional(v.string()),
+		additionalInfo: v.optional(v.string()),
 		createdBy: v.optional(v.id("users")),
 	},
 	handler: async (ctx, args) => {
@@ -18,6 +21,9 @@ export const addMovie = mutation({
 			koreanTitle: args.koreanTitle,
 			releaseDate: args.releaseDate,
 			kobisMovieCode: args.kobisMovieCode,
+			year: args.year,
+			directors: args.directors,
+			additionalInfo: args.additionalInfo,
 			viewCount: 0,
 			createdAt: Date.now(),
 			createdBy: args.createdBy,
@@ -173,6 +179,20 @@ export const addMovieFromKobis = action({
 			throw new Error("Movie already exists in database");
 		}
 
+		// Extract directors
+		const directors = movieInfo.directors
+			?.map((d: { peopleNm: string }) => d.peopleNm)
+			.join(", ");
+
+		// Extract additional info (nation and genres)
+		const nationAlt = movieInfo.nations
+			?.map((n: { nationNm: string }) => n.nationNm)
+			.join(", ");
+		const genreAlt = movieInfo.genres
+			?.map((g: { genreNm: string }) => g.genreNm)
+			.join(", ");
+		const additionalInfo = [nationAlt, genreAlt].filter(Boolean).join(" • ");
+
 		// Create movie with KOBIS data
 		const movieId = await ctx.runMutation(api.movies.addMovie, {
 			shortId,
@@ -180,6 +200,9 @@ export const addMovieFromKobis = action({
 			koreanTitle: movieInfo.movieNm,
 			releaseDate: movieInfo.openDt,
 			kobisMovieCode: args.movieCd,
+			year: movieInfo.prdtYear,
+			directors,
+			additionalInfo,
 			createdBy: user._id,
 		});
 

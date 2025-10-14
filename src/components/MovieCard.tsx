@@ -1,69 +1,78 @@
 import { Link } from "@tanstack/react-router";
 
-type Movie = {
-	_id: string;
-	_creationTime: number;
-	shortId: string;
-	originalTitle: string;
+type BaseMovie = {
 	koreanTitle?: string;
-	releaseDate?: string;
-	viewCount: number;
-	createdAt: number;
+	originalTitle: string;
+	year?: string;
+	directors?: string;
+	additionalInfo?: string;
 };
 
-type MovieCardProps = {
-	movie: Movie;
+type MovieCardAsLinkProps = {
+	mode: "link";
+	movie: BaseMovie & {
+		shortId: string;
+	};
 };
 
-const KOBIS_DATE_LENGTH = 8;
-const YEAR_START = 0;
-const YEAR_END = 4;
-const MONTH_START = 4;
-const MONTH_END = 6;
-const DAY_START = 6;
+type MovieCardAsButtonProps = {
+	mode: "button";
+	movie: BaseMovie;
+	onClick: () => void;
+	disabled?: boolean;
+	isLoading?: boolean;
+};
 
-function formatReleaseDate(dateStr?: string): string | null {
-	if (!dateStr) {
-		return null;
-	}
+type MovieCardProps = MovieCardAsLinkProps | MovieCardAsButtonProps;
 
-	// KOBIS format: YYYYMMDD (e.g., "20191030")
-	if (dateStr.length === KOBIS_DATE_LENGTH) {
-		const year = dateStr.slice(YEAR_START, YEAR_END);
-		const month = dateStr.slice(MONTH_START, MONTH_END);
-		const day = dateStr.slice(DAY_START);
-		return `${year}.${month}.${day}`;
-	}
+function MovieCardContent({ movie }: { movie: BaseMovie }) {
+	return (
+		<div className="card-body">
+			{/* Korean Title (Main) */}
+			<h3 className="card-title line-clamp-2 text-base">
+				{movie.koreanTitle || movie.originalTitle}
+			</h3>
 
-	return dateStr;
+			{/* Original Title (Subtitle) - only show if different from Korean title */}
+			{movie.koreanTitle && movie.originalTitle !== movie.koreanTitle && (
+				<p className="mb-1 line-clamp-2 text-sm opacity-70">
+					{movie.originalTitle}
+				</p>
+			)}
+
+			{/* Movie Metadata */}
+			<div className="flex flex-wrap gap-2 text-xs opacity-60">
+				{movie.year && <span>{movie.year}년</span>}
+				{movie.directors && <span>• {movie.directors}</span>}
+				{movie.additionalInfo && <span>• {movie.additionalInfo}</span>}
+			</div>
+		</div>
+	);
 }
 
-export default function MovieCard({ movie }: MovieCardProps) {
-	const formattedDate = formatReleaseDate(movie.releaseDate);
+export default function MovieCard(props: MovieCardProps) {
+	if (props.mode === "link") {
+		return (
+			<Link
+				className="card bg-base-200 transition-all hover:shadow-xl"
+				params={{ shortId: props.movie.shortId }}
+				to="/movie/$shortId"
+			>
+				<MovieCardContent movie={props.movie} />
+			</Link>
+		);
+	}
 
 	return (
-		<Link
-			className="card bg-base-200 transition-all hover:shadow-xl"
-			params={{ shortId: movie.shortId }}
-			to="/movie/$shortId"
+		<button
+			className={`card w-full bg-base-200 text-left transition-all hover:shadow-lg ${
+				props.isLoading ? "cursor-wait opacity-50" : ""
+			}`}
+			disabled={props.disabled || props.isLoading}
+			onClick={props.onClick}
+			type="button"
 		>
-			{/* Content */}
-			<div className="card-body">
-				{/* Korean Title (Main) */}
-				<h3 className="card-title line-clamp-2">
-					{movie.koreanTitle || movie.originalTitle}
-				</h3>
-
-				{/* Original Title (Subtitle) - only show if different from Korean title */}
-				{movie.koreanTitle && (
-					<p className="line-clamp-2 opacity-80">{movie.originalTitle}</p>
-				)}
-
-				{/* Release Date */}
-				{formattedDate && (
-					<span className="text-right opacity-50">{formattedDate}</span>
-				)}
-			</div>
-		</Link>
+			<MovieCardContent movie={props.movie} />
+		</button>
 	);
 }

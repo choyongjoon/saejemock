@@ -10,7 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as MovieAddRouteImport } from './routes/movie/add'
+import { Route as MovieSearchRouteImport } from './routes/movie/search'
 import { Route as MovieShortIdRouteImport } from './routes/movie/$shortId'
 import { Route as DemoConvexRouteImport } from './routes/demo/convex'
 import { Route as DemoClerkRouteImport } from './routes/demo/clerk'
@@ -27,9 +27,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MovieAddRoute = MovieAddRouteImport.update({
-  id: '/movie/add',
-  path: '/movie/add',
+const MovieSearchRoute = MovieSearchRouteImport.update({
+  id: '/movie/search',
+  path: '/movie/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MovieShortIdRoute = MovieShortIdRouteImport.update({
@@ -88,7 +88,7 @@ export interface FileRoutesByFullPath {
   '/demo/clerk': typeof DemoClerkRoute
   '/demo/convex': typeof DemoConvexRoute
   '/movie/$shortId': typeof MovieShortIdRoute
-  '/movie/add': typeof MovieAddRoute
+  '/movie/search': typeof MovieSearchRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
@@ -102,7 +102,7 @@ export interface FileRoutesByTo {
   '/demo/clerk': typeof DemoClerkRoute
   '/demo/convex': typeof DemoConvexRoute
   '/movie/$shortId': typeof MovieShortIdRoute
-  '/movie/add': typeof MovieAddRoute
+  '/movie/search': typeof MovieSearchRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
@@ -117,7 +117,7 @@ export interface FileRoutesById {
   '/demo/clerk': typeof DemoClerkRoute
   '/demo/convex': typeof DemoConvexRoute
   '/movie/$shortId': typeof MovieShortIdRoute
-  '/movie/add': typeof MovieAddRoute
+  '/movie/search': typeof MovieSearchRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
@@ -133,7 +133,7 @@ export interface FileRouteTypes {
     | '/demo/clerk'
     | '/demo/convex'
     | '/movie/$shortId'
-    | '/movie/add'
+    | '/movie/search'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
@@ -147,7 +147,7 @@ export interface FileRouteTypes {
     | '/demo/clerk'
     | '/demo/convex'
     | '/movie/$shortId'
-    | '/movie/add'
+    | '/movie/search'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
@@ -161,7 +161,7 @@ export interface FileRouteTypes {
     | '/demo/clerk'
     | '/demo/convex'
     | '/movie/$shortId'
-    | '/movie/add'
+    | '/movie/search'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
@@ -176,7 +176,7 @@ export interface RootRouteChildren {
   DemoClerkRoute: typeof DemoClerkRoute
   DemoConvexRoute: typeof DemoConvexRoute
   MovieShortIdRoute: typeof MovieShortIdRoute
-  MovieAddRoute: typeof MovieAddRoute
+  MovieSearchRoute: typeof MovieSearchRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
@@ -195,11 +195,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/movie/add': {
-      id: '/movie/add'
-      path: '/movie/add'
-      fullPath: '/movie/add'
-      preLoaderRoute: typeof MovieAddRouteImport
+    '/movie/search': {
+      id: '/movie/search'
+      path: '/movie/search'
+      fullPath: '/movie/search'
+      preLoaderRoute: typeof MovieSearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/movie/$shortId': {
@@ -280,7 +280,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoClerkRoute: DemoClerkRoute,
   DemoConvexRoute: DemoConvexRoute,
   MovieShortIdRoute: MovieShortIdRoute,
-  MovieAddRoute: MovieAddRoute,
+  MovieSearchRoute: MovieSearchRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,

@@ -16,7 +16,7 @@ function HomePage() {
 					<div className="max-w-3xl">
 						<h1 className="mb-4 font-bold text-5xl">새 제목</h1>
 						<p className="mb-8 text-xl">맘에 안 드는 영화 제목을 고쳐보세요.</p>
-						<Link className="btn btn-primary btn-lg" to="/movie/add">
+						<Link className="btn btn-primary btn-lg" to="/movie/search">
 							영화 찾기
 						</Link>
 					</div>
@@ -49,10 +49,10 @@ type MovieWithVotes = Movie & {
 
 function MoviesSection() {
 	const moviesByVotes = useQuery(api.movies.getMoviesByTotalVotes, {
-		limit: 6,
+		limit: 5,
 	});
-	const moviesByViews = useQuery(api.movies.getMoviesByViewCount, { limit: 6 });
-	const recentMovies = useQuery(api.movies.getMoviesByCreatedAt, { limit: 6 });
+	const moviesByViews = useQuery(api.movies.getMoviesByViewCount, { limit: 5 });
+	const recentMovies = useQuery(api.movies.getMoviesByCreatedAt, { limit: 5 });
 
 	const isLoading =
 		moviesByVotes === undefined ||
@@ -77,7 +77,7 @@ function MoviesSection() {
 					</div>
 					<div className="grid grid-cols-1 gap-2">
 						{moviesByVotes.map((movie: MovieWithVotes) => (
-							<MovieCard key={movie._id} movie={movie} />
+							<MovieCard key={movie._id} mode="link" movie={movie} />
 						))}
 					</div>
 				</section>
@@ -91,7 +91,7 @@ function MoviesSection() {
 					</div>
 					<div className="grid grid-cols-1 gap-2">
 						{moviesByViews.map((movie: Movie) => (
-							<MovieCard key={movie._id} movie={movie} />
+							<MovieCard key={movie._id} mode="link" movie={movie} />
 						))}
 					</div>
 				</section>
@@ -105,7 +105,7 @@ function MoviesSection() {
 					</div>
 					<div className="grid grid-cols-1 gap-2">
 						{recentMovies.map((movie: Movie) => (
-							<MovieCard key={movie._id} movie={movie} />
+							<MovieCard key={movie._id} mode="link" movie={movie} />
 						))}
 					</div>
 				</section>
