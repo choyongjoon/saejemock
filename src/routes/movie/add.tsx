@@ -183,7 +183,8 @@ function SearchMoviePage() {
 
 	// Merge results from DB and KOBIS
 	const mergedResults = useMergedResults(dbResults, kobisResults);
-	const isLoading = isSearchingKobis || dbResults === undefined;
+	const isLoading =
+		isSearchingKobis || (debouncedQuery && dbResults === undefined);
 
 	return (
 		<div className="min-h-screen bg-base-100">
