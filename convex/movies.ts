@@ -198,3 +198,28 @@ export const getMovieByKobisCode = query({
 		return movie;
 	},
 });
+
+/**
+ * Search movies in our database by title (Korean or original)
+ */
+export const searchMovies = query({
+	args: { searchQuery: v.string() },
+	handler: async (ctx, args) => {
+		const searchTerm = args.searchQuery.toLowerCase().trim();
+
+		if (!searchTerm) {
+			return [];
+		}
+
+		// Get all movies and filter by title match
+		const allMovies = await ctx.db.query("movies").collect();
+
+		return allMovies.filter((movie) => {
+			const koreanMatch = movie.koreanTitle?.toLowerCase().includes(searchTerm);
+			const originalMatch = movie.originalTitle
+				.toLowerCase()
+				.includes(searchTerm);
+			return koreanMatch || originalMatch;
+		});
+	},
+});
