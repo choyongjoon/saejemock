@@ -29,7 +29,6 @@ type MergedMovie = {
 	originalTitle: string;
 	year?: string;
 	directors?: string;
-	posterUrl?: string;
 	additionalInfo?: string;
 };
 
@@ -40,8 +39,8 @@ function useMergedResults(
 				shortId: string;
 				originalTitle: string;
 				koreanTitle?: string;
-				posterUrl?: string;
-				imdbId?: string;
+				releaseDate?: string;
+				kobisMovieCode?: string;
 		  }>
 		| undefined,
 	kobisResults: KobisMovie[]
@@ -58,11 +57,10 @@ function useMergedResults(
 				shortId: movie.shortId,
 				koreanTitle: movie.koreanTitle || movie.originalTitle,
 				originalTitle: movie.originalTitle,
-				posterUrl: movie.posterUrl,
 			});
-			// Track KOBIS codes if available (stored in imdbId field)
-			if (movie.imdbId) {
-				addedMovieCodes.add(movie.imdbId);
+			// Track KOBIS codes if available
+			if (movie.kobisMovieCode) {
+				addedMovieCodes.add(movie.kobisMovieCode);
 			}
 		}
 	}
@@ -88,6 +86,78 @@ function useMergedResults(
 	return mergedResults;
 }
 
+function MovieResultCard({
+	movie,
+	index,
+	isAdding,
+	isSignedIn,
+	onMovieClick,
+}: {
+	movie: MergedMovie;
+	index: number;
+	isAdding: boolean;
+	isSignedIn: boolean;
+	onMovieClick: (movie: MergedMovie) => void;
+}) {
+	return (
+		<button
+			className={`card card-compact w-full bg-base-200 text-left transition-all hover:shadow-lg ${
+				isAdding ? "cursor-wait opacity-50" : ""
+			}`}
+			disabled={isAdding || !(movie.inDB || isSignedIn)}
+			key={`${movie.source}-${movie.shortId || movie.movieCd || index}`}
+			onClick={() => onMovieClick(movie)}
+			type="button"
+		>
+			<div className="card-body">
+				<div className="flex items-start justify-between gap-4">
+					<div className="flex-1">
+						<div className="mb-1 flex items-center gap-2">
+							<h3 className="card-title text-base">{movie.koreanTitle}</h3>
+							{movie.inDB ? (
+								<span className="badge badge-primary badge-sm">DB</span>
+							) : (
+								<span className="badge badge-secondary badge-sm">KOBIS</span>
+							)}
+						</div>
+						{movie.originalTitle !== movie.koreanTitle && (
+							<p className="mb-1 text-sm opacity-70">{movie.originalTitle}</p>
+						)}
+						<div className="flex flex-wrap gap-2 text-xs opacity-60">
+							{movie.year && <span>{movie.year}년</span>}
+							{movie.directors && <span>• {movie.directors}</span>}
+							{movie.additionalInfo && <span>• {movie.additionalInfo}</span>}
+						</div>
+					</div>
+
+					{!(movie.inDB || isSignedIn) && (
+						<div className="flex items-center gap-2">
+							<SignInButton mode="modal">
+								<button
+									className="btn btn-ghost btn-sm"
+									onClick={(e) => e.stopPropagation()}
+									type="button"
+								>
+									로그인 필요
+								</button>
+							</SignInButton>
+						</div>
+					)}
+					{!movie.inDB && isSignedIn && (
+						<div className="flex items-center">
+							{isAdding ? (
+								<span className="loading loading-spinner loading-sm text-primary" />
+							) : (
+								<span className="text-primary text-sm">클릭하여 추가 →</span>
+							)}
+						</div>
+					)}
+				</div>
+			</div>
+		</button>
+	);
+}
+
 function SearchMoviePage() {
 	const { isSignedIn } = useUser();
 	const [searchQuery, setSearchQuery] = useState("");
@@ -95,6 +165,7 @@ function SearchMoviePage() {
 	const [kobisResults, setKobisResults] = useState<KobisMovie[]>([]);
 	const [isSearchingKobis, setIsSearchingKobis] = useState(false);
 	const [isAdding, setIsAdding] = useState(false);
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	const searchKobis = useAction(api.kobis.searchMoviesByTitle);
 	const addMovieFromKobis = useAction(api.movies.addMovieFromKobis);
@@ -116,11 +187,12 @@ function SearchMoviePage() {
 
 		setDebouncedQuery(query);
 		setIsSearchingKobis(true);
+		setErrorMessage(null);
 
 		try {
 			const result = await searchKobis({ movieNm: query });
 
-			if (result.movieListResult.movieList) {
+			if (result?.movieListResult?.movieList) {
 				const transformedResults = result.movieListResult.movieList.map(
 					(movie: {
 						movieCd: string;
@@ -147,9 +219,19 @@ function SearchMoviePage() {
 				setKobisResults(transformedResults);
 			} else {
 				setKobisResults([]);
+				if (!result?.movieListResult) {
+					setErrorMessage(
+						"KOBIS API 응답 형식이 올바르지 않습니다. 데이터베이스 결과만 표시됩니다."
+					);
+				}
 			}
-		} catch {
+		} catch (error) {
 			setKobisResults([]);
+			setErrorMessage(
+				error instanceof Error
+					? error.message
+					: "KOBIS 검색 중 오류가 발생했습니다. 데이터베이스 결과만 표시됩니다."
+			);
 		} finally {
 			setIsSearchingKobis(false);
 		}
@@ -173,8 +255,13 @@ function SearchMoviePage() {
 					to: "/movie/$shortId",
 					params: { shortId: result.shortId },
 				});
-			} catch {
-				// Error handled silently
+			} catch (error) {
+				console.error("Failed to add movie:", error);
+				setErrorMessage(
+					error instanceof Error
+						? `영화 추가 실패: ${error.message}`
+						: "영화를 추가하는 중 오류가 발생했습니다."
+				);
 			} finally {
 				setIsAdding(false);
 			}
@@ -184,7 +271,7 @@ function SearchMoviePage() {
 	// Merge results from DB and KOBIS
 	const mergedResults = useMergedResults(dbResults, kobisResults);
 	const isLoading =
-		isSearchingKobis || (debouncedQuery && dbResults === undefined);
+		isSearchingKobis || (Boolean(debouncedQuery) && dbResults === undefined);
 
 	return (
 		<div className="min-h-screen bg-base-100">
@@ -224,6 +311,29 @@ function SearchMoviePage() {
 					</form>
 				</div>
 
+				{/* Error Message */}
+				{errorMessage && (
+					<div className="mx-auto mb-4 max-w-4xl">
+						<div className="alert alert-warning">
+							<svg
+								className="h-6 w-6 flex-shrink-0 stroke-current"
+								fill="none"
+								viewBox="0 0 24 24"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<title>Warning</title>
+								<path
+									d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth="2"
+								/>
+							</svg>
+							<span>{errorMessage}</span>
+						</div>
+					</div>
+				)}
+
 				{/* Loading State */}
 				{isLoading && debouncedQuery && (
 					<div className="flex justify-center py-12">
@@ -250,69 +360,14 @@ function SearchMoviePage() {
 
 						<div className="space-y-2">
 							{mergedResults.map((movie, index) => (
-								<button
-									className={`card card-compact w-full bg-base-200 text-left transition-all hover:shadow-lg ${
-										isAdding ? "cursor-wait opacity-50" : ""
-									}`}
-									disabled={isAdding || !(movie.inDB || isSignedIn)}
+								<MovieResultCard
+									index={index}
+									isAdding={isAdding}
+									isSignedIn={Boolean(isSignedIn)}
 									key={`${movie.source}-${movie.shortId || movie.movieCd || index}`}
-									onClick={() => handleMovieClick(movie)}
-									type="button"
-								>
-									<div className="card-body">
-										<div className="flex items-start justify-between gap-4">
-											<div className="flex-1">
-												<div className="mb-1 flex items-center gap-2">
-													<h3 className="card-title text-base">
-														{movie.koreanTitle}
-													</h3>
-													{movie.inDB ? (
-														<span className="badge badge-primary badge-sm">
-															DB
-														</span>
-													) : (
-														<span className="badge badge-secondary badge-sm">
-															KOBIS
-														</span>
-													)}
-												</div>
-												{movie.originalTitle !== movie.koreanTitle && (
-													<p className="mb-1 text-sm opacity-70">
-														{movie.originalTitle}
-													</p>
-												)}
-												<div className="flex flex-wrap gap-2 text-xs opacity-60">
-													{movie.year && <span>{movie.year}년</span>}
-													{movie.directors && <span>• {movie.directors}</span>}
-													{movie.additionalInfo && (
-														<span>• {movie.additionalInfo}</span>
-													)}
-												</div>
-											</div>
-
-											{!(movie.inDB || isSignedIn) && (
-												<div className="flex items-center gap-2">
-													<SignInButton mode="modal">
-														<button
-															className="btn btn-ghost btn-sm"
-															onClick={(e) => e.stopPropagation()}
-															type="button"
-														>
-															로그인 필요
-														</button>
-													</SignInButton>
-												</div>
-											)}
-											{!movie.inDB && isSignedIn && (
-												<div className="flex items-center">
-													<span className="text-primary text-sm">
-														클릭하여 추가 →
-													</span>
-												</div>
-											)}
-										</div>
-									</div>
-								</button>
+									movie={movie}
+									onMovieClick={handleMovieClick}
+								/>
 							))}
 						</div>
 					</div>

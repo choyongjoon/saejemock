@@ -41,6 +41,7 @@
         "useFilenamingConvention": "off"
       },
       "suspicious": {
+        "noConsole": "off",
         "noUnknownAtRules": "off"
       }
     }

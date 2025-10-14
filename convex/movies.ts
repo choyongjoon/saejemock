@@ -7,20 +7,20 @@ export const addMovie = mutation({
 		shortId: v.string(),
 		originalTitle: v.string(),
 		koreanTitle: v.optional(v.string()),
-		posterUrl: v.optional(v.string()),
-		imdbId: v.optional(v.string()),
-		imdbUrl: v.optional(v.string()),
+		releaseDate: v.optional(v.string()),
+		kobisMovieCode: v.optional(v.string()),
+		createdBy: v.optional(v.id("users")),
 	},
 	handler: async (ctx, args) => {
 		const movieId = await ctx.db.insert("movies", {
 			shortId: args.shortId,
 			originalTitle: args.originalTitle,
 			koreanTitle: args.koreanTitle,
-			posterUrl: args.posterUrl,
-			imdbId: args.imdbId,
-			imdbUrl: args.imdbUrl,
+			releaseDate: args.releaseDate,
+			kobisMovieCode: args.kobisMovieCode,
 			viewCount: 0,
 			createdAt: Date.now(),
+			createdBy: args.createdBy,
 		});
 		return movieId;
 	},
@@ -136,7 +136,6 @@ export const incrementViewCount = mutation({
 export const addMovieFromKobis = action({
 	args: {
 		movieCd: v.string(),
-		posterUrl: v.optional(v.string()),
 	},
 	handler: async (ctx, args): Promise<{ movieId: string; shortId: string }> => {
 		// Check authentication
@@ -145,8 +144,12 @@ export const addMovieFromKobis = action({
 			throw new Error("You must be logged in to add movies");
 		}
 
-		// Sync user to database
-		await ctx.runMutation(api.users.syncUser, {});
+		// Get current user from database
+		const user = await ctx.runQuery(api.users.current, {});
+
+		if (!user) {
+			throw new Error("User not found. Please make sure you are logged in.");
+		}
 
 		// Fetch movie data from KOBIS API
 		const kobisData = await ctx.runAction(api.kobis.getMovieInfo, {
@@ -175,10 +178,9 @@ export const addMovieFromKobis = action({
 			shortId,
 			originalTitle: movieInfo.movieNmEn || movieInfo.movieNmOg,
 			koreanTitle: movieInfo.movieNm,
-			posterUrl: args.posterUrl,
-			imdbId: args.movieCd, // Store KOBIS movie code in imdbId field
-			imdbUrl:
-				"https://www.kobis.or.kr/kobis/business/mast/mvie/searchMovieList.do",
+			releaseDate: movieInfo.openDt,
+			kobisMovieCode: args.movieCd,
+			createdBy: user._id,
 		});
 
 		// Create official title suggestion with Korean name
@@ -195,14 +197,16 @@ export const addMovieFromKobis = action({
 });
 
 /**
- * Get movie by KOBIS movie code (stored in imdbId field)
+ * Get movie by KOBIS movie code
  */
 export const getMovieByKobisCode = query({
 	args: { movieCd: v.string() },
 	handler: async (ctx, args) => {
 		const movie = await ctx.db
 			.query("movies")
-			.filter((q) => q.eq(q.field("imdbId"), args.movieCd))
+			.withIndex("by_kobisMovieCode", (q) =>
+				q.eq("kobisMovieCode", args.movieCd)
+			)
 			.first();
 		return movie;
 	},

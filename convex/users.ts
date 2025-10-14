@@ -1,70 +1,64 @@
-import { mutation, query } from "./_generated/server";
+import type { UserJSON } from "@clerk/backend";
+import { type Validator, v } from "convex/values";
+import { internalMutation, type QueryCtx, query } from "./_generated/server";
 
-/**
- * Get or create user from Clerk authentication
- */
-export const getCurrentUser = query({
+export const current = query({
 	args: {},
-	handler: async (ctx) => {
-		const identity = await ctx.auth.getUserIdentity();
-		if (!identity) {
-			return null;
+	handler: async (ctx) => await getCurrentUser(ctx),
+});
+
+export const upsertFromClerk = internalMutation({
+	args: { data: v.any() as Validator<UserJSON> }, // no runtime validation, trust Clerk
+	async handler(ctx, { data }) {
+		const userAttributes = {
+			name: `${data.first_name} ${data.last_name}`,
+			clerkId: data.id,
+			createdAt: data.created_at,
+		};
+
+		const user = await userByClerkId(ctx, data.id);
+		if (user === null) {
+			await ctx.db.insert("users", userAttributes);
+		} else {
+			await ctx.db.patch(user._id, userAttributes);
 		}
-
-		const user = await ctx.db
-			.query("users")
-			.withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
-			.first();
-
-		return user;
 	},
 });
 
-/**
- * Sync user from Clerk to Convex database
- */
-export const syncUser = mutation({
-	args: {},
-	handler: async (ctx) => {
-		const identity = await ctx.auth.getUserIdentity();
-		if (!identity) {
-			throw new Error("Not authenticated");
+export const deleteFromClerk = internalMutation({
+	args: { clerkUserId: v.string() },
+	async handler(ctx, { clerkUserId }) {
+		const user = await userByClerkId(ctx, clerkUserId);
+
+		if (user !== null) {
+			await ctx.db.delete(user._id);
+		} else {
+			console.warn(
+				`Can't delete user, there is none for Clerk user ID: ${clerkUserId}`
+			);
 		}
-
-		// Check if user already exists
-		const existingUser = await ctx.db
-			.query("users")
-			.withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
-			.first();
-
-		if (existingUser) {
-			// Update user info if needed
-			await ctx.db.patch(existingUser._id, {
-				email: identity.email,
-				name: identity.name,
-			});
-			return existingUser._id;
-		}
-
-		// Create new user
-		const userId = await ctx.db.insert("users", {
-			clerkId: identity.subject,
-			email: identity.email,
-			name: identity.name,
-			createdAt: Date.now(),
-		});
-
-		return userId;
 	},
 });
 
-/**
- * Check if current user is authenticated
- */
-export const isAuthenticated = query({
-	args: {},
-	handler: async (ctx) => {
-		const identity = await ctx.auth.getUserIdentity();
-		return identity !== null;
-	},
-});
+export async function getCurrentUserOrThrow(ctx: QueryCtx) {
+	const userRecord = await getCurrentUser(ctx);
+	if (!userRecord) {
+		throw new Error("Can't get current user");
+	}
+	return userRecord;
+}
+
+export async function getCurrentUser(ctx: QueryCtx) {
+	const identity = await ctx.auth.getUserIdentity();
+	if (identity === null) {
+		return null;
+	}
+	return await userByClerkId(ctx, identity.subject);
+}
+
+async function userByClerkId(ctx: QueryCtx, externalId: string) {
+	return await ctx.db
+		.query("users")
+		.withIndex("by_clerkId", (q) => q.eq("clerkId", externalId))
+		.unique();
+}

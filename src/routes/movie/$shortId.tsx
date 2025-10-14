@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { MovieInfo } from "../../components/movie/MovieInfo";
-import { MoviePoster } from "../../components/movie/MoviePoster";
 
 export const Route = createFileRoute("/movie/$shortId")({
 	component: MoviePage,
@@ -34,17 +33,12 @@ function MoviePage() {
 	return (
 		<div className="container mx-auto px-4 py-8">
 			<div className="mx-auto max-w-4xl">
-				<div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-					<MoviePoster
-						posterUrl={movie.posterUrl}
-						title={movie.originalTitle}
-					/>
-					<MovieInfo
-						koreanTitle={movie.koreanTitle}
-						originalTitle={movie.originalTitle}
-						titleSuggestions={movie.titleSuggestions || []}
-					/>
-				</div>
+				<MovieInfo
+					koreanTitle={movie.koreanTitle}
+					originalTitle={movie.originalTitle}
+					releaseDate={movie.releaseDate}
+					titleSuggestions={movie.titleSuggestions || []}
+				/>
 			</div>
 		</div>
 	);

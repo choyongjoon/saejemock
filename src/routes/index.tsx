@@ -37,9 +37,8 @@ type Movie = {
 	shortId: string;
 	originalTitle: string;
 	koreanTitle?: string;
-	posterUrl?: string;
-	imdbId?: string;
-	imdbUrl?: string;
+	releaseDate?: string;
+	kobisMovieCode?: string;
 	viewCount: number;
 	createdAt: number;
 };

@@ -16,19 +16,49 @@ type TitleSuggestion = {
 type MovieInfoProps = {
 	originalTitle: string;
 	koreanTitle?: string;
+	releaseDate?: string;
 	titleSuggestions: TitleSuggestion[];
 };
+
+const KOBIS_DATE_LENGTH = 8;
+const YEAR_START = 0;
+const YEAR_END = 4;
+const MONTH_START = 4;
+const MONTH_END = 6;
+const DAY_START = 6;
+
+function formatReleaseDate(dateStr?: string): string | null {
+	if (!dateStr) {
+		return null;
+	}
+
+	// KOBIS format: YYYYMMDD (e.g., "20191030")
+	if (dateStr.length === KOBIS_DATE_LENGTH) {
+		const year = dateStr.slice(YEAR_START, YEAR_END);
+		const month = dateStr.slice(MONTH_START, MONTH_END);
+		const day = dateStr.slice(DAY_START);
+		return `${year}.${month}.${day}`;
+	}
+
+	return dateStr;
+}
 
 export function MovieInfo({
 	originalTitle,
 	koreanTitle,
+	releaseDate,
 	titleSuggestions,
 }: MovieInfoProps) {
+	const formattedDate = formatReleaseDate(releaseDate);
+
 	return (
-		<div className="md:col-span-2">
+		<div>
 			<h1 className="mb-2 font-bold text-3xl">{originalTitle}</h1>
 			{koreanTitle && (
-				<h2 className="mb-6 text-gray-600 text-xl">{koreanTitle}</h2>
+				<h2 className="mb-2 text-gray-600 text-xl">{koreanTitle}</h2>
+			)}
+			{formattedDate && (
+				<p className="mb-6 text-gray-500 text-sm">개봉일: {formattedDate}</p>
 			)}
 
 			{/* Title Suggestions Section */}

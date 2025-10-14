@@ -21,15 +21,16 @@ export default defineSchema({
 		shortId: v.string(),
 		originalTitle: v.string(),
 		koreanTitle: v.optional(v.string()),
-		posterUrl: v.optional(v.string()),
-		imdbId: v.optional(v.string()),
-		imdbUrl: v.optional(v.string()),
+		releaseDate: v.optional(v.string()),
+		kobisMovieCode: v.optional(v.string()),
 		viewCount: v.number(),
 		createdAt: v.number(),
+		createdBy: v.optional(v.id("users")),
 	})
 		.index("by_shortId", ["shortId"])
 		.index("by_viewCount", ["viewCount"])
-		.index("by_createdAt", ["createdAt"]),
+		.index("by_createdAt", ["createdAt"])
+		.index("by_kobisMovieCode", ["kobisMovieCode"]),
 	titleSuggestions: defineTable({
 		movieId: v.id("movies"),
 		title: v.string(),

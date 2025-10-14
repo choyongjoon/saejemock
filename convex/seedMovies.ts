@@ -24,10 +24,8 @@ export const seedOneBattleAfterAnother = mutation({
 			shortId: "one-battle-after-another",
 			originalTitle: "One Battle After Another",
 			koreanTitle: "연이은 전투",
-			posterUrl:
-				"https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop",
-			imdbId: "tt0000000",
-			imdbUrl: "https://www.imdb.com/title/tt0000000/",
+			releaseDate: "20240101",
+			kobisMovieCode: "20240000",
 			viewCount: 42,
 			createdAt: Date.now(),
 		});

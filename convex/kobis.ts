@@ -90,8 +90,21 @@ export const searchMoviesByTitle = action({
 			throw new Error(`KOBIS API request failed: ${response.statusText}`);
 		}
 
-		const data: KobisMovieListResponse = await response.json();
-		return data;
+		const data = await response.json();
+
+		// Check for KOBIS API error response
+		if (data.faultInfo) {
+			throw new Error(
+				`KOBIS API error: ${data.faultInfo.message} (${data.faultInfo.errorCode})`
+			);
+		}
+
+		// Validate response structure
+		if (!data.movieListResult) {
+			throw new Error("Invalid KOBIS API response: missing movieListResult");
+		}
+
+		return data as KobisMovieListResponse;
 	},
 });
 
@@ -118,8 +131,21 @@ export const getMovieInfo = action({
 			throw new Error(`KOBIS API request failed: ${response.statusText}`);
 		}
 
-		const data: KobisMovieInfoResponse = await response.json();
-		return data;
+		const data = await response.json();
+
+		// Check for KOBIS API error response
+		if (data.faultInfo) {
+			throw new Error(
+				`KOBIS API error: ${data.faultInfo.message} (${data.faultInfo.errorCode})`
+			);
+		}
+
+		// Validate response structure
+		if (!data.movieInfoResult) {
+			throw new Error("Invalid KOBIS API response: missing movieInfoResult");
+		}
+
+		return data as KobisMovieInfoResponse;
 	},
 });
 
