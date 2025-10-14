@@ -79,8 +79,10 @@ export const searchMoviesByTitle = action({
 			);
 		}
 
+		const defaultItemsPerPage = 50;
+
 		const curPage = args.curPage ?? 1;
-		const itemPerPage = args.itemPerPage ?? 10;
+		const itemPerPage = args.itemPerPage ?? defaultItemsPerPage;
 
 		// KOBIS Movie List API endpoint
 		const url = `http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieList.json?key=${apiKey}&movieNm=${encodeURIComponent(args.movieNm)}&curPage=${curPage}&itemPerPage=${itemPerPage}`;
@@ -90,21 +92,20 @@ export const searchMoviesByTitle = action({
 			throw new Error(`KOBIS API request failed: ${response.statusText}`);
 		}
 
-		const data = await response.json();
-
-		// Check for KOBIS API error response
-		if (data.faultInfo) {
-			throw new Error(
-				`KOBIS API error: ${data.faultInfo.message} (${data.faultInfo.errorCode})`
-			);
-		}
+		const data: KobisMovieListResponse = await response.json();
 
 		// Validate response structure
 		if (!data.movieListResult) {
 			throw new Error("Invalid KOBIS API response: missing movieListResult");
 		}
 
-		return data as KobisMovieListResponse;
+		// filter movies
+		data.movieListResult.movieList = data.movieListResult.movieList.filter(
+			(movie) =>
+				movie.directors.length > 0 && !movie.genreAlt.includes("성인물")
+		);
+
+		return data;
 	},
 });
 
@@ -146,41 +147,5 @@ export const getMovieInfo = action({
 		}
 
 		return data as KobisMovieInfoResponse;
-	},
-});
-
-/**
- * Search for movies and get detailed info
- */
-export const searchAndGetMovieDetails = action({
-	args: {
-		movieNm: v.string(),
-	},
-	handler: async (ctx, args) => {
-		// Search for movies
-		const searchResults = await ctx.runAction(
-			// @ts-expect-error - Internal API reference
-			ctx.runAction.api.kobis.searchMoviesByTitle,
-			{
-				movieNm: args.movieNm,
-				itemPerPage: 20,
-			}
-		);
-
-		// Return simplified search results
-		return searchResults.movieListResult.movieList.map(
-			(movie: KobisMovieListItem) => ({
-				movieCd: movie.movieCd,
-				movieNm: movie.movieNm,
-				movieNmEn: movie.movieNmEn,
-				prdtYear: movie.prdtYear,
-				openDt: movie.openDt,
-				directors: movie.directors
-					.map((d: { peopleNm: string }) => d.peopleNm)
-					.join(", "),
-				nationAlt: movie.nationAlt,
-				genreAlt: movie.genreAlt,
-			})
-		);
 	},
 });
