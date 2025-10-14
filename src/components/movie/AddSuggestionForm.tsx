@@ -79,15 +79,15 @@ export function AddSuggestionForm({ onSubmit }: AddSuggestionFormProps) {
 						/>
 					</div>
 					<div className="flex gap-2">
-						<button className="btn btn-primary flex-1" type="submit">
-							제안하기
-						</button>
 						<button
 							className="btn btn-warning"
 							onClick={handleCancel}
 							type="button"
 						>
 							취소
+						</button>
+						<button className="btn btn-primary flex-1" type="submit">
+							제안하기
 						</button>
 					</div>
 				</form>

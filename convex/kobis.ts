@@ -163,7 +163,7 @@ export const searchAndGetMovieDetails = action({
 			ctx.runAction.api.kobis.searchMoviesByTitle,
 			{
 				movieNm: args.movieNm,
-				itemPerPage: 10,
+				itemPerPage: 20,
 			}
 		);
 

@@ -1,6 +1,4 @@
-import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
 import Header from "../components/Header";
 
@@ -51,7 +49,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					<ConvexProvider>
 						<Header />
 						{children}
-						<TanStackDevtools
+						{/*<TanStackDevtools
 							config={{
 								position: "bottom-right",
 							}}
@@ -61,7 +59,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 									render: <TanStackRouterDevtoolsPanel />,
 								},
 							]}
-						/>
+						/>*/}
 					</ConvexProvider>
 				</ClerkProvider>
 				<Scripts />

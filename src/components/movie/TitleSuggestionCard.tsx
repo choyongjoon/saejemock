@@ -110,23 +110,23 @@ export function TitleSuggestionCard({
 		>
 			<div>
 				<span className="text-2xl tabular-nums">#{index + 1}</span>
-				{suggestion.isOfficial ? (
+				{suggestion.isOfficial && (
 					<div className="text-center text-xs">공식</div>
-				) : null}
+				)}
+				{isCreator && !suggestion.isOfficial && (
+					<button
+						className="btn btn-ghost btn-xs opacity-40 hover:opacity-100"
+						onClick={handleDeleteClick}
+						title="삭제"
+						type="button"
+					>
+						<Trash2 size={14} />
+					</button>
+				)}
 			</div>
 			<div className="flex-1">
 				<div className="flex items-center gap-2">
 					<h4 className="font-semibold text-2xl">{suggestion.title}</h4>
-					{isCreator && !suggestion.isOfficial ? (
-						<button
-							className="btn btn-ghost btn-xs opacity-40 hover:opacity-100"
-							onClick={handleDeleteClick}
-							title="삭제"
-							type="button"
-						>
-							<Trash2 size={14} />
-						</button>
-					) : null}
 				</div>
 				<p className="line-clamp-1 opacity-80">{suggestion.description}</p>
 			</div>
