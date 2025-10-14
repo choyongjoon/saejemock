@@ -188,7 +188,6 @@ export const addMovieFromKobis = action({
 			await ctx.runMutation(api.titleSuggestions.addOfficialSuggestion, {
 				movieId,
 				title: movieInfo.movieNm,
-				description: "공식 한글 제목",
 			});
 		}
 

@@ -1,4 +1,5 @@
 import { ClerkProvider } from "@clerk/clerk-react";
+import { koKR } from "@clerk/localizations";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 if (!PUBLISHABLE_KEY) {
@@ -11,7 +12,11 @@ export default function AppClerkProvider({
 	children: React.ReactNode;
 }) {
 	return (
-		<ClerkProvider afterSignOutUrl="/" publishableKey={PUBLISHABLE_KEY}>
+		<ClerkProvider
+			afterSignOutUrl="/"
+			localization={koKR}
+			publishableKey={PUBLISHABLE_KEY}
+		>
 			{children}
 		</ClerkProvider>
 	);
