@@ -110,6 +110,53 @@ export const searchMoviesByTitle = action({
 });
 
 /**
+ * Search for movies by director name in KOBIS
+ */
+export const searchMoviesByDirector = action({
+	args: {
+		directorNm: v.string(),
+		curPage: v.optional(v.number()),
+		itemPerPage: v.optional(v.number()),
+	},
+	handler: async (_, args): Promise<KobisMovieListResponse> => {
+		const apiKey = process.env.KOBIS_API_KEY;
+		if (!apiKey) {
+			throw new Error(
+				"KOBIS_API_KEY not configured. Get your API key at https://www.kobis.or.kr/kobisopenapi/"
+			);
+		}
+
+		const defaultItemsPerPage = 50;
+
+		const curPage = args.curPage ?? 1;
+		const itemPerPage = args.itemPerPage ?? defaultItemsPerPage;
+
+		// KOBIS Movie List API endpoint with directorNm parameter
+		const url = `http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieList.json?key=${apiKey}&directorNm=${encodeURIComponent(args.directorNm)}&curPage=${curPage}&itemPerPage=${itemPerPage}`;
+
+		const response = await fetch(url);
+		if (!response.ok) {
+			throw new Error(`KOBIS API request failed: ${response.statusText}`);
+		}
+
+		const data: KobisMovieListResponse = await response.json();
+
+		// Validate response structure
+		if (!data.movieListResult) {
+			throw new Error("Invalid KOBIS API response: missing movieListResult");
+		}
+
+		// filter movies
+		data.movieListResult.movieList = data.movieListResult.movieList.filter(
+			(movie) =>
+				movie.directors.length > 0 && !movie.genreAlt.includes("성인물")
+		);
+
+		return data;
+	},
+});
+
+/**
  * Get movie details by movie code
  */
 export const getMovieInfo = action({

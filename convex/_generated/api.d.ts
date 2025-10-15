@@ -18,6 +18,7 @@ import type * as kobis from "../kobis.js";
 import type * as movies from "../movies.js";
 import type * as seedMovies from "../seedMovies.js";
 import type * as shortId from "../shortId.js";
+import type * as testDirectorSearch from "../testDirectorSearch.js";
 import type * as testMovieTitle from "../testMovieTitle.js";
 import type * as titleSuggestions from "../titleSuggestions.js";
 import type * as todos from "../todos.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   movies: typeof movies;
   seedMovies: typeof seedMovies;
   shortId: typeof shortId;
+  testDirectorSearch: typeof testDirectorSearch;
   testMovieTitle: typeof testMovieTitle;
   titleSuggestions: typeof titleSuggestions;
   todos: typeof todos;

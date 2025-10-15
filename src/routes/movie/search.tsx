@@ -12,6 +12,7 @@ import {
 
 const movieAddSearchSchema = z.object({
 	q: z.string().optional(),
+	type: z.enum(["title", "director"]).optional().default("title"),
 });
 
 export const Route = createFileRoute("/movie/search")({
@@ -93,32 +94,45 @@ function useMergedResults(
 function SearchMoviePage() {
 	const { isSignedIn } = useUser();
 	const navigate = useNavigate();
-	const { q } = Route.useSearch();
+	const { q, type } = Route.useSearch();
 
 	const [searchQuery, setSearchQuery] = useState(q || "");
+	const [searchType, setSearchType] = useState<"title" | "director">(
+		type || "title"
+	);
 	const [debouncedQuery, setDebouncedQuery] = useState(q || "");
+	const [debouncedType, setDebouncedType] = useState<"title" | "director">(
+		type || "title"
+	);
 	const [kobisResults, setKobisResults] = useState<KobisMovie[]>([]);
 	const [isSearchingKobis, setIsSearchingKobis] = useState(false);
 	const [isAdding, setIsAdding] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-	const searchKobis = useAction(api.kobis.searchMoviesByTitle);
+	const searchKobisByTitle = useAction(api.kobis.searchMoviesByTitle);
+	const searchKobisByDirector = useAction(api.kobis.searchMoviesByDirector);
 	const addMovieFromKobis = useAction(api.movies.addMovieFromKobis);
 
 	// Search our DB
 	const dbResults = useQuery(
 		api.movies.searchMovies,
-		debouncedQuery ? { searchQuery: debouncedQuery } : "skip"
+		debouncedQuery
+			? { searchQuery: debouncedQuery, searchType: debouncedType }
+			: "skip"
 	);
 
 	const performSearch = useCallback(
-		async (query: string) => {
+		async (query: string, searchMode: "title" | "director") => {
 			setDebouncedQuery(query);
+			setDebouncedType(searchMode);
 			setIsSearchingKobis(true);
 			setErrorMessage(null);
 
 			try {
-				const result = await searchKobis({ movieNm: query });
+				const result =
+					searchMode === "director"
+						? await searchKobisByDirector({ directorNm: query })
+						: await searchKobisByTitle({ movieNm: query });
 
 				if (result?.movieListResult?.movieList) {
 					const transformedResults = result.movieListResult.movieList.map(
@@ -164,15 +178,15 @@ function SearchMoviePage() {
 				setIsSearchingKobis(false);
 			}
 		},
-		[searchKobis]
+		[searchKobisByTitle, searchKobisByDirector]
 	);
 
 	// Trigger search on mount if query param exists
 	useEffect(() => {
 		if (q?.trim()) {
-			performSearch(q.trim());
+			performSearch(q.trim(), type);
 		}
-	}, [q, performSearch]);
+	}, [q, type, performSearch]);
 
 	const handleSearch = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -182,13 +196,13 @@ function SearchMoviePage() {
 			return;
 		}
 
-		// Update URL with search query
+		// Update URL with search query and type
 		await navigate({
 			to: "/movie/search",
-			search: { q: query },
+			search: { q: query, type: searchType },
 		});
 
-		await performSearch(query);
+		await performSearch(query, searchType);
 	};
 
 	const handleMovieClick = async (movie: MergedMovie) => {
@@ -241,12 +255,35 @@ function SearchMoviePage() {
 				{/* Search Form */}
 				<div className="mb-8">
 					<form className="mx-auto max-w-2xl" onSubmit={handleSearch}>
+						{/* Search Type Selector */}
+						<div className="mb-4 flex justify-center gap-2">
+							<button
+								className={`btn btn-sm ${searchType === "title" ? "btn-primary" : "btn-ghost"}`}
+								onClick={() => setSearchType("title")}
+								type="button"
+							>
+								제목
+							</button>
+							<button
+								className={`btn btn-sm ${searchType === "director" ? "btn-primary" : "btn-ghost"}`}
+								onClick={() => setSearchType("director")}
+								type="button"
+							>
+								감독
+							</button>
+						</div>
+
+						{/* Search Input */}
 						<div className="join w-full">
 							<input
 								className="input input-bordered join-item flex-1"
 								disabled={isLoading}
 								onChange={(e) => setSearchQuery(e.target.value)}
-								placeholder="영화 제목을 입력하세요 (한글 또는 영어)"
+								placeholder={
+									searchType === "director"
+										? "감독 이름을 입력하세요"
+										: "영화 제목을 입력하세요 (한글 또는 영어)"
+								}
 								type="text"
 								value={searchQuery}
 							/>

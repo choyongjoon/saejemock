@@ -242,18 +242,31 @@ export const getMovieByKobisCode = query({
  * Search movies in our database by title (Korean or original)
  */
 export const searchMovies = query({
-	args: { searchQuery: v.string() },
+	args: {
+		searchQuery: v.string(),
+		searchType: v.optional(v.union(v.literal("title"), v.literal("director"))),
+	},
 	handler: async (ctx, args) => {
 		const searchTerm = args.searchQuery.toLowerCase().trim();
+		const searchType = args.searchType ?? "title";
 
 		if (!searchTerm) {
 			return [];
 		}
 
-		// Get all movies and filter by title match
+		// Get all movies and filter by search type
 		const allMovies = await ctx.db.query("movies").collect();
 
 		return allMovies.filter((movie) => {
+			if (searchType === "director") {
+				// Search by director name
+				const directorMatch = movie.directors
+					?.toLowerCase()
+					.includes(searchTerm);
+				return directorMatch;
+			}
+
+			// Default: search by title
 			const koreanMatch = movie.koreanTitle?.toLowerCase().includes(searchTerm);
 			const originalMatch = movie.originalTitle
 				.toLowerCase()
