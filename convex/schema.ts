@@ -8,15 +8,6 @@ export default defineSchema({
 		name: v.optional(v.string()),
 		createdAt: v.number(),
 	}).index("by_clerkId", ["clerkId"]),
-	products: defineTable({
-		title: v.string(),
-		imageId: v.string(),
-		price: v.number(),
-	}),
-	todos: defineTable({
-		text: v.string(),
-		completed: v.boolean(),
-	}),
 	movies: defineTable({
 		shortId: v.string(),
 		originalTitle: v.string(),
