@@ -6,6 +6,7 @@ export const addMovie = mutation({
 	args: {
 		shortId: v.string(),
 		originalTitle: v.string(),
+		englishTitle: v.optional(v.string()),
 		koreanTitle: v.optional(v.string()),
 		releaseDate: v.optional(v.string()),
 		kobisMovieCode: v.optional(v.string()),
@@ -18,6 +19,7 @@ export const addMovie = mutation({
 		const movieId = await ctx.db.insert("movies", {
 			shortId: args.shortId,
 			originalTitle: args.originalTitle,
+			englishTitle: args.englishTitle,
 			koreanTitle: args.koreanTitle,
 			releaseDate: args.releaseDate,
 			kobisMovieCode: args.kobisMovieCode,
@@ -196,7 +198,9 @@ export const addMovieFromKobis = action({
 		// Create movie with KOBIS data
 		const movieId = await ctx.runMutation(api.movies.addMovie, {
 			shortId,
-			originalTitle: movieInfo.movieNmEn || movieInfo.movieNmOg,
+			originalTitle:
+				movieInfo.movieNmOg || movieInfo.movieNmEn || movieInfo.movieNm,
+			englishTitle: movieInfo.movieNmEn,
 			koreanTitle: movieInfo.movieNm,
 			releaseDate: movieInfo.openDt,
 			kobisMovieCode: args.movieCd,

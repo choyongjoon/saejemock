@@ -20,6 +20,7 @@ export default defineSchema({
 	movies: defineTable({
 		shortId: v.string(),
 		originalTitle: v.string(),
+		englishTitle: v.optional(v.string()),
 		koreanTitle: v.optional(v.string()),
 		releaseDate: v.optional(v.string()),
 		kobisMovieCode: v.optional(v.string()),
