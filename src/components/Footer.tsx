@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 export default function Footer() {
 	return (
-		<footer className="footer footer-center bg-base-200 p-10 text-base-content">
+		<footer className="footer footer-center grid-rows-2 bg-base-200 p-10 text-base-content">
 			<nav className="grid grid-flow-col gap-4">
 				<Link className="link-hover link" to="/privacy">
 					개인정보처리방침

@@ -338,7 +338,7 @@ function SearchMoviePage() {
 							<div className="card-body">
 								<Search className="mx-auto h-16 w-16 opacity-20" />
 								<h3 className="card-title justify-center">영화를 검색하세요</h3>
-								<p className="opacity-70">
+								<p className="break-keep opacity-70">
 									영화관입장권통합전산망 오픈 API를 사용하여 검색합니다.
 								</p>
 							</div>

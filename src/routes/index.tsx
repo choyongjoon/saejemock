@@ -15,7 +15,9 @@ function HomePage() {
 				<div className="hero-content text-center">
 					<div className="max-w-3xl">
 						<h1 className="mb-4 font-bold text-5xl">새 제목</h1>
-						<p className="mb-8 text-xl">맘에 안 드는 영화 제목을 고쳐보세요.</p>
+						<p className="mb-8 break-keep text-xl">
+							맘에 안 드는 영화 제목을 고쳐보세요.
+						</p>
 						<Link className="btn btn-primary btn-lg" to="/movie/search">
 							영화 찾기
 						</Link>

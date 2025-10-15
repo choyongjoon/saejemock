@@ -101,33 +101,33 @@ export function TitleSuggestionCard({
 
 	return (
 		<li
-			className={`min-h-22 list-row items-center ${
+			className={`min-h-21 list-row items-center px-0 ${
 				suggestion.isOfficial ? "border-amber-400" : "border-gray-200"
 			}`}
 			style={{
 				viewTransitionName: `suggestion-${suggestion._id}`,
 			}}
 		>
-			<div>
-				<span className="text-2xl tabular-nums">#{index + 1}</span>
+			<div className="h-full">
+				<span className="text-xl tabular-nums">#{index + 1}</span>
 				{suggestion.isOfficial && (
 					<div className="text-center text-xs">공식</div>
 				)}
 				{isCreator && !suggestion.isOfficial && (
-					<button
-						className="btn btn-ghost btn-xs opacity-40 hover:opacity-100"
-						onClick={handleDeleteClick}
-						title="삭제"
-						type="button"
-					>
-						<Trash2 size={14} />
-					</button>
+					<div className="flex items-center">
+						<button
+							className="btn btn-ghost btn-xs px-1 opacity-40 hover:opacity-100"
+							onClick={handleDeleteClick}
+							title="삭제"
+							type="button"
+						>
+							<Trash2 size={14} />
+						</button>
+					</div>
 				)}
 			</div>
-			<div className="flex-1">
-				<div className="flex items-center gap-2">
-					<h4 className="font-semibold text-2xl">{suggestion.title}</h4>
-				</div>
+			<div className="h-full flex-1 items-start">
+				<h4 className="font-semibold text-xl">{suggestion.title}</h4>
 				<p className="line-clamp-1 opacity-80">{suggestion.description}</p>
 			</div>
 			<div className="text-sm tabular-nums">{suggestion.votesCount}</div>
