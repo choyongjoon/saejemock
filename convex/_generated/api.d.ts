@@ -16,12 +16,8 @@ import type {
 import type * as http from "../http.js";
 import type * as kobis from "../kobis.js";
 import type * as movies from "../movies.js";
-import type * as seedMovies from "../seedMovies.js";
 import type * as shortId from "../shortId.js";
-import type * as testDirectorSearch from "../testDirectorSearch.js";
-import type * as testMovieTitle from "../testMovieTitle.js";
 import type * as titleSuggestions from "../titleSuggestions.js";
-import type * as todos from "../todos.js";
 import type * as users from "../users.js";
 
 /**
@@ -36,12 +32,8 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   kobis: typeof kobis;
   movies: typeof movies;
-  seedMovies: typeof seedMovies;
   shortId: typeof shortId;
-  testDirectorSearch: typeof testDirectorSearch;
-  testMovieTitle: typeof testMovieTitle;
   titleSuggestions: typeof titleSuggestions;
-  todos: typeof todos;
   users: typeof users;
 }>;
 export declare const api: FilterApi<
