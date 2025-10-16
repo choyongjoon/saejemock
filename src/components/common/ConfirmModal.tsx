@@ -1,3 +1,6 @@
+import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
+
 type ConfirmModalProps = {
 	isOpen: boolean;
 	title: string;
@@ -17,13 +20,30 @@ export function ConfirmModal({
 	onConfirm,
 	onCancel,
 }: ConfirmModalProps) {
-	if (!isOpen) {
+	const modalRoot = useRef<HTMLDivElement | null>(null);
+
+	useEffect(() => {
+		// Create modal root if it doesn't exist
+		if (!modalRoot.current) {
+			const existingRoot = document.getElementById("modal-root");
+			if (existingRoot) {
+				modalRoot.current = existingRoot as HTMLDivElement;
+			} else {
+				const div = document.createElement("div");
+				div.id = "modal-root";
+				document.body.appendChild(div);
+				modalRoot.current = div;
+			}
+		}
+	}, []);
+
+	if (!(isOpen && modalRoot.current)) {
 		return null;
 	}
 
-	return (
-		<div className="modal modal-open">
-			<div className="modal-box">
+	return createPortal(
+		<div className="modal modal-open z-[9999]">
+			<div className="modal-box relative z-[10000]">
 				<h3 className="font-bold text-lg">{title}</h3>
 				<p className="py-4">{message}</p>
 				<div className="modal-action">
@@ -35,6 +55,13 @@ export function ConfirmModal({
 					</button>
 				</div>
 			</div>
-		</div>
+			<button
+				aria-label="Close modal"
+				className="modal-backdrop fixed inset-0 z-[9998] bg-black/50"
+				onClick={onCancel}
+				type="button"
+			/>
+		</div>,
+		modalRoot.current
 	);
 }
