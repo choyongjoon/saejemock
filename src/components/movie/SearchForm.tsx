@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import type { SearchType } from "../../types/movie";
 
 type SearchFormProps = {
@@ -7,6 +7,7 @@ type SearchFormProps = {
 	isLoading: boolean;
 	onSearchQueryChange: (query: string) => void;
 	onSearchTypeChange: (type: SearchType) => void;
+	onClear: () => void;
 	onSubmit: (e: React.FormEvent) => void;
 };
 
@@ -16,6 +17,7 @@ export function SearchForm({
 	isLoading,
 	onSearchQueryChange,
 	onSearchTypeChange,
+	onClear,
 	onSubmit,
 }: SearchFormProps) {
 	return (
@@ -40,18 +42,29 @@ export function SearchForm({
 
 			{/* Search Input */}
 			<div className="join w-full">
-				<input
-					className="input input-bordered join-item flex-1"
-					disabled={isLoading}
-					onChange={(e) => onSearchQueryChange(e.target.value)}
-					placeholder={
-						searchType === "director"
-							? "감독 이름을 입력하세요"
-							: "영화 제목을 입력하세요 (한글 또는 영어)"
-					}
-					type="text"
-					value={searchQuery}
-				/>
+				<div className="relative flex-1">
+					<input
+						className="input input-bordered w-full pr-10"
+						disabled={isLoading}
+						onChange={(e) => onSearchQueryChange(e.target.value)}
+						placeholder={
+							searchType === "director"
+								? "감독 이름을 입력하세요"
+								: "영화 제목을 입력하세요 (한글 또는 영어)"
+						}
+						type="text"
+						value={searchQuery}
+					/>
+					{searchQuery && (
+						<button
+							className="btn btn-circle btn-ghost btn-sm -translate-y-1/2 absolute top-1/2 right-2"
+							onClick={onClear}
+							type="button"
+						>
+							<X className="h-4 w-4" />
+						</button>
+					)}
+				</div>
 				<button
 					className="btn btn-primary join-item"
 					disabled={isLoading}

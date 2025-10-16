@@ -76,6 +76,15 @@ function SearchMoviePage() {
 		await performSearch(query, searchType);
 	};
 
+	const handleClear = () => {
+		setSearchQuery("");
+		setDebouncedQuery("");
+		navigate({
+			to: "/movie/search",
+			search: {},
+		});
+	};
+
 	const handleMovieClick = async (movie: MergedMovie) => {
 		if (movie.inDB && movie.shortId) {
 			// Navigate to existing movie
@@ -122,6 +131,7 @@ function SearchMoviePage() {
 				<div className="mb-8">
 					<SearchForm
 						isLoading={isLoading}
+						onClear={handleClear}
 						onSearchQueryChange={setSearchQuery}
 						onSearchTypeChange={setSearchType}
 						onSubmit={handleSearch}
