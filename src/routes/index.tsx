@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import MovieCard from "../components/MovieCard";
+import type { Movie } from "../types/movie";
 
 export const Route = createFileRoute("/")({
 	component: HomePage,
@@ -32,22 +33,6 @@ function HomePage() {
 		</div>
 	);
 }
-
-type Movie = {
-	_id: string;
-	_creationTime: number;
-	shortId: string;
-	originalTitle: string;
-	koreanTitle?: string;
-	releaseDate?: string;
-	kobisMovieCode?: string;
-	viewCount: number;
-	createdAt: number;
-};
-
-type MovieWithVotes = Movie & {
-	totalVotes: number;
-};
 
 function MoviesSection() {
 	const moviesByVotesData = useQuery(api.movies.getMoviesByTotalVotes, {
@@ -93,7 +78,7 @@ function MoviesSection() {
 						</Link>
 					</div>
 					<div className="grid grid-cols-1 gap-2">
-						{moviesByVotes.map((movie: MovieWithVotes) => (
+						{moviesByVotes.map((movie: Movie) => (
 							<MovieCard key={movie._id} mode="link" movie={movie} />
 						))}
 					</div>

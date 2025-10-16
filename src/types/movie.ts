@@ -1,3 +1,16 @@
+export type Movie = {
+	_id: string;
+	_creationTime: number;
+	shortId: string;
+	originalTitle: string;
+	koreanTitle?: string;
+	releaseDate?: string;
+	kobisMovieCode?: string;
+	viewCount: number;
+	createdAt: number;
+	totalVotes?: number;
+};
+
 export type KobisMovie = {
 	movieCd: string;
 	movieNm: string;

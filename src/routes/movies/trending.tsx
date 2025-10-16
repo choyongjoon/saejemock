@@ -4,6 +4,7 @@ import { z } from "zod";
 import { api } from "../../../convex/_generated/api";
 import Pagination from "../../components/common/Pagination";
 import MovieCard from "../../components/MovieCard";
+import type { Movie } from "../../types/movie";
 
 const searchSchema = z.object({
 	page: z.number().int().positive().catch(1),
@@ -13,18 +14,6 @@ export const Route = createFileRoute("/movies/trending")({
 	validateSearch: (search) => searchSchema.parse(search),
 	component: TrendingMoviesPage,
 });
-
-type Movie = {
-	_id: string;
-	_creationTime: number;
-	shortId: string;
-	originalTitle: string;
-	koreanTitle?: string;
-	releaseDate?: string;
-	kobisMovieCode?: string;
-	viewCount: number;
-	createdAt: number;
-};
 
 function TrendingMoviesPage() {
 	const { page } = Route.useSearch();
