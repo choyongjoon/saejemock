@@ -5,14 +5,14 @@ import {
 	UserButton,
 } from "@clerk/clerk-react";
 import { Link } from "@tanstack/react-router";
-import { Film } from "lucide-react";
+import { Clapperboard } from "lucide-react";
 
 export default function Header() {
 	return (
 		<div className="navbar bg-base-200 shadow-lg">
 			<div className="navbar-start">
 				<Link className="btn btn-ghost text-xl" to="/">
-					<Film className="h-6 w-6" />새 제목
+					<Clapperboard className="h-6 w-6" />새 제목
 				</Link>
 			</div>
 
