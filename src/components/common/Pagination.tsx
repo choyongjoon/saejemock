@@ -91,25 +91,27 @@ export default function Pagination({
 				))}
 
 				{/* Last page if not visible */}
-				{pageNumbers.at(-1) < totalPages && (
-					<>
-						{pageNumbers.at(-1) < totalPages - 1 && (
-							<button
-								className="btn btn-disabled btn-sm join-item"
-								type="button"
+				{pageNumbers.length > 0 &&
+					pageNumbers.at(-1) !== undefined &&
+					pageNumbers.at(-1)! < totalPages && (
+						<>
+							{pageNumbers.at(-1)! < totalPages - 1 && (
+								<button
+									className="btn btn-disabled btn-sm join-item"
+									type="button"
+								>
+									...
+								</button>
+							)}
+							<Link
+								className="btn btn-sm join-item"
+								search={{ page: totalPages }}
+								to={basePath}
 							>
-								...
-							</button>
-						)}
-						<Link
-							className="btn btn-sm join-item"
-							search={{ page: totalPages }}
-							to={basePath}
-						>
-							{totalPages}
-						</Link>
-					</>
-				)}
+								{totalPages}
+							</Link>
+						</>
+					)}
 
 				{/* Next Button */}
 				{currentPage < totalPages ? (

@@ -32,17 +32,15 @@ function MoviePage() {
 
 	return (
 		<div className="container mx-auto px-4 py-8">
-			<div className="mx-auto max-w-4xl">
-				<MovieInfo
-					additionalInfo={movie.additionalInfo}
-					directors={movie.directors}
-					koreanTitle={movie.koreanTitle}
-					originalTitle={movie.originalTitle}
-					releaseDate={movie.releaseDate}
-					titleSuggestions={movie.titleSuggestions || []}
-					year={movie.year}
-				/>
-			</div>
+			<MovieInfo
+				additionalInfo={movie.additionalInfo}
+				directors={movie.directors}
+				koreanTitle={movie.koreanTitle}
+				originalTitle={movie.originalTitle}
+				releaseDate={movie.releaseDate}
+				titleSuggestions={movie.titleSuggestions || []}
+				year={movie.year}
+			/>
 		</div>
 	);
 }

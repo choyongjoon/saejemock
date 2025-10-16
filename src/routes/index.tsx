@@ -84,7 +84,11 @@ function MoviesSection() {
 				<section>
 					<div className="mb-6 flex items-center justify-between">
 						<h2 className="font-bold text-3xl">투표가 많은 영화</h2>
-						<Link className="link-hover link text-sm" to="/movies/popular">
+						<Link
+							className="link-hover link text-sm"
+							search={{ page: 1 }}
+							to="/movies/popular"
+						>
 							더보기 →
 						</Link>
 					</div>
@@ -101,7 +105,11 @@ function MoviesSection() {
 				<section>
 					<div className="mb-6 flex items-center justify-between">
 						<h2 className="font-bold text-3xl">조회수가 높은 영화</h2>
-						<Link className="link-hover link text-sm" to="/movies/trending">
+						<Link
+							className="link-hover link text-sm"
+							search={{ page: 1 }}
+							to="/movies/trending"
+						>
 							더보기 →
 						</Link>
 					</div>
@@ -118,7 +126,11 @@ function MoviesSection() {
 				<section>
 					<div className="mb-6 flex items-center justify-between">
 						<h2 className="font-bold text-3xl">신규 추가 영화</h2>
-						<Link className="link-hover link text-sm" to="/movies/recent">
+						<Link
+							className="link-hover link text-sm"
+							search={{ page: 1 }}
+							to="/movies/recent"
+						>
 							더보기 →
 						</Link>
 					</div>
