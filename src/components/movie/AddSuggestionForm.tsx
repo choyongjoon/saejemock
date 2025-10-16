@@ -2,7 +2,10 @@ import { SignInButton, useUser } from "@clerk/clerk-react";
 import { useState } from "react";
 
 type AddSuggestionFormProps = {
-	onSubmit: (title: string, description?: string) => Promise<void>;
+	onSubmit: (
+		title: string,
+		description?: string
+	) => Promise<{ success: boolean; error?: string }>;
 };
 
 export function AddSuggestionForm({ onSubmit }: AddSuggestionFormProps) {
@@ -10,19 +13,25 @@ export function AddSuggestionForm({ onSubmit }: AddSuggestionFormProps) {
 	const [isAddingNew, setIsAddingNew] = useState(false);
 	const [newTitle, setNewTitle] = useState("");
 	const [newDescription, setNewDescription] = useState("");
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!newTitle.trim()) {
 			return;
 		}
-		try {
-			await onSubmit(newTitle.trim(), newDescription.trim() || undefined);
+		setErrorMessage(null);
+		const result = await onSubmit(
+			newTitle.trim(),
+			newDescription.trim() || undefined
+		);
+
+		if (result.success) {
 			setNewTitle("");
 			setNewDescription("");
 			setIsAddingNew(false);
-		} catch {
-			// Error handled silently
+		} else {
+			setErrorMessage(result.error || "Failed to add suggestion");
 		}
 	};
 
@@ -30,6 +39,7 @@ export function AddSuggestionForm({ onSubmit }: AddSuggestionFormProps) {
 		setIsAddingNew(false);
 		setNewTitle("");
 		setNewDescription("");
+		setErrorMessage(null);
 	};
 
 	if (!isSignedIn) {
@@ -47,6 +57,11 @@ export function AddSuggestionForm({ onSubmit }: AddSuggestionFormProps) {
 			<li className="flex list-row">
 				<form className="card w-full" onSubmit={handleSubmit}>
 					<h4 className="mb-4 font-semibold text-lg">새로운 제목 제안</h4>
+					{errorMessage && (
+						<div className="alert alert-error mb-4">
+							<span>{errorMessage}</span>
+						</div>
+					)}
 					<div className="mb-4">
 						<label
 							className="mb-2 block font-medium text-sm"

@@ -17,6 +17,20 @@ export const addSuggestion = mutation({
 			throw new Error("You must be logged in to add title suggestions");
 		}
 
+		// Check for duplicate title
+		const existingSuggestions = await ctx.db
+			.query("titleSuggestions")
+			.withIndex("by_movie", (q) => q.eq("movieId", args.movieId))
+			.collect();
+
+		const duplicateExists = existingSuggestions.some(
+			(s) => s.title.trim() === args.title.trim()
+		);
+
+		if (duplicateExists) {
+			throw new Error("A suggestion with this title already exists");
+		}
+
 		// Get or create user
 		const user = await ctx.db
 			.query("users")
@@ -55,6 +69,21 @@ export const addOfficialSuggestion = mutation({
 		description: v.optional(v.string()),
 	},
 	handler: async (ctx, args) => {
+		// Check for duplicate title
+		const existingSuggestions = await ctx.db
+			.query("titleSuggestions")
+			.withIndex("by_movie", (q) => q.eq("movieId", args.movieId))
+			.collect();
+
+		const duplicateExists = existingSuggestions.some(
+			(s) => s.title.trim() === args.title.trim()
+		);
+
+		if (duplicateExists) {
+			// Don't throw error for official suggestions, just skip
+			return null;
+		}
+
 		const suggestionId = await ctx.db.insert("titleSuggestions", {
 			movieId: args.movieId,
 			title: args.title,

@@ -72,15 +72,25 @@ export function TitleSuggestions({ suggestions }: TitleSuggestionsProps) {
 		});
 	};
 
-	const handleAddSuggestion = async (title: string, description?: string) => {
+	const handleAddSuggestion = async (
+		title: string,
+		description?: string
+	): Promise<{ success: boolean; error?: string }> => {
 		if (!movieId) {
-			return;
+			return { success: false, error: "Movie ID not found" };
 		}
-		await addSuggestion({
-			movieId,
-			title,
-			description,
-		});
+		try {
+			await addSuggestion({
+				movieId,
+				title,
+				description,
+			});
+			return { success: true };
+		} catch (error) {
+			const errorMessage =
+				error instanceof Error ? error.message : "Failed to add suggestion";
+			return { success: false, error: errorMessage };
+		}
 	};
 
 	const topSuggestions = suggestions.slice(0, TOP_SUGGESTIONS_COUNT);
