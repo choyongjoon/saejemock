@@ -1,23 +1,14 @@
 import { Link } from "@tanstack/react-router";
-
-type BaseMovie = {
-	koreanTitle?: string;
-	originalTitle: string;
-	year?: string;
-	directors?: string;
-	additionalInfo?: string;
-};
+import type { Movie } from "@/types/movie";
 
 type MovieCardAsLinkProps = {
 	mode: "link";
-	movie: BaseMovie & {
-		shortId: string;
-	};
+	movie: Movie;
 };
 
 type MovieCardAsButtonProps = {
 	mode: "button";
-	movie: BaseMovie;
+	movie: Movie;
 	onClick: () => void;
 	disabled?: boolean;
 	isLoading?: boolean;
@@ -25,20 +16,15 @@ type MovieCardAsButtonProps = {
 
 type MovieCardProps = MovieCardAsLinkProps | MovieCardAsButtonProps;
 
-function MovieCardContent({ movie }: { movie: BaseMovie }) {
+function MovieCardContent({ movie }: { movie: Movie }) {
 	return (
 		<div className="card-body">
 			{/* Korean Title (Main) */}
-			<h3 className="card-title line-clamp-2 text-base">
-				{movie.koreanTitle || movie.originalTitle}
-			</h3>
+			<h3 className="card-title line-clamp-2 text-base">{movie.koreanTitle}</h3>
 
-			{/* Original Title (Subtitle) - only show if different from Korean title */}
-			{movie.koreanTitle && movie.originalTitle !== movie.koreanTitle && (
-				<p className="mb-1 line-clamp-2 text-sm opacity-70">
-					{movie.originalTitle}
-				</p>
-			)}
+			<p className="mb-1 line-clamp-2 text-sm opacity-70">
+				{movie.originalTitle || movie.englishTitle}
+			</p>
 
 			{/* Movie Metadata */}
 			<div className="flex flex-wrap gap-2 text-xs opacity-60">

@@ -1,15 +1,6 @@
-export type Movie = {
-	_id: string;
-	_creationTime: number;
-	shortId: string;
-	originalTitle: string;
-	koreanTitle?: string;
-	releaseDate?: string;
-	kobisMovieCode?: string;
-	viewCount: number;
-	createdAt: number;
-	totalVotes?: number;
-};
+import type { Doc } from "convex/_generated/dataModel";
+
+export type Movie = Doc<"movies">;
 
 export type KobisMovie = {
 	movieCd: string;

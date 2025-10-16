@@ -18,20 +18,21 @@ type TitleSuggestion = {
 };
 
 type TitleSuggestionsProps = {
+	movieId: Id<"movies">;
 	suggestions: TitleSuggestion[];
 };
 
 const TOP_SUGGESTIONS_COUNT = 3;
 
-export function TitleSuggestions({ suggestions }: TitleSuggestionsProps) {
+export function TitleSuggestions({
+	movieId,
+	suggestions,
+}: TitleSuggestionsProps) {
 	const voteForSuggestion = useMutation(api.titleSuggestions.voteForSuggestion);
 	const cancelVote = useMutation(api.titleSuggestions.cancelVote);
 	const addSuggestion = useMutation(api.titleSuggestions.addSuggestion);
 	const deleteSuggestion = useMutation(api.titleSuggestions.deleteSuggestion);
 	const { startTransition } = useViewTransition();
-
-	// Get movie ID from the first suggestion
-	const movieId = suggestions[0]?.movieId;
 
 	// Get current user
 	const currentUser = useQuery(api.users.current);

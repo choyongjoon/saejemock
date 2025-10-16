@@ -5,11 +5,11 @@ import { action, mutation, query } from "./_generated/server";
 export const addMovie = mutation({
 	args: {
 		shortId: v.string(),
-		originalTitle: v.string(),
+		originalTitle: v.optional(v.string()),
 		englishTitle: v.optional(v.string()),
-		koreanTitle: v.optional(v.string()),
-		releaseDate: v.optional(v.string()),
-		kobisMovieCode: v.optional(v.string()),
+		koreanTitle: v.string(),
+		releaseDate: v.string(),
+		kobisMovieCode: v.string(),
 		year: v.optional(v.string()),
 		directors: v.optional(v.string()),
 		additionalInfo: v.optional(v.string()),
@@ -241,8 +241,7 @@ export const addMovieFromKobis = action({
 		// Create movie with KOBIS data
 		const movieId = await ctx.runMutation(api.movies.addMovie, {
 			shortId,
-			originalTitle:
-				movieInfo.movieNmOg || movieInfo.movieNmEn || movieInfo.movieNm,
+			originalTitle: movieInfo.movieNmOg,
 			englishTitle: movieInfo.movieNmEn,
 			koreanTitle: movieInfo.movieNm,
 			releaseDate: movieInfo.openDt,
@@ -312,7 +311,7 @@ export const searchMovies = query({
 			// Default: search by title
 			const koreanMatch = movie.koreanTitle?.toLowerCase().includes(searchTerm);
 			const originalMatch = movie.originalTitle
-				.toLowerCase()
+				?.toLowerCase()
 				.includes(searchTerm);
 			return koreanMatch || originalMatch;
 		});

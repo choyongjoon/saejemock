@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "convex/react";
 import { useEffect } from "react";
 import { api } from "../../../convex/_generated/api";
 import { MovieInfo } from "../../components/movie/MovieInfo";
+import { TitleSuggestions } from "../../components/movie/TitleSuggestions";
 
 export const Route = createFileRoute("/movie/$shortId")({
 	component: MoviePage,
@@ -43,15 +44,15 @@ function MoviePage() {
 
 	return (
 		<div className="container mx-auto px-4 py-8">
-			<MovieInfo
-				additionalInfo={movie.additionalInfo}
-				directors={movie.directors}
-				koreanTitle={movie.koreanTitle}
-				originalTitle={movie.originalTitle}
-				releaseDate={movie.releaseDate}
-				titleSuggestions={movie.titleSuggestions || []}
-				year={movie.year}
-			/>
+			<MovieInfo movie={movie} />
+
+			<div className="mt-12">
+				<h3 className="font-bold text-2xl">제목 제안</h3>
+				<TitleSuggestions
+					movieId={movie._id}
+					suggestions={movie.titleSuggestions || []}
+				/>
+			</div>
 		</div>
 	);
 }
