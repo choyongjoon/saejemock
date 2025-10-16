@@ -107,21 +107,6 @@ export const getSuggestionsByMovie = query({
 	},
 });
 
-const DEFAULT_TOP_SUGGESTIONS_LIMIT = 3;
-
-export const getTopSuggestions = query({
-	args: { movieId: v.id("movies"), limit: v.optional(v.number()) },
-	handler: async (ctx, args) => {
-		const limit = args.limit ?? DEFAULT_TOP_SUGGESTIONS_LIMIT;
-		const suggestions = await ctx.db
-			.query("titleSuggestions")
-			.withIndex("by_votes", (q) => q.eq("movieId", args.movieId))
-			.order("desc")
-			.take(limit);
-		return suggestions;
-	},
-});
-
 /**
  * Get user's vote for a movie (returns the suggestion they voted for)
  */
@@ -354,35 +339,5 @@ export const voteForSuggestion = mutation({
 		await ctx.db.patch(args.suggestionId, {
 			votesCount: suggestion.votesCount + 1,
 		});
-	},
-});
-
-export const addComment = mutation({
-	args: {
-		suggestionId: v.id("titleSuggestions"),
-		userId: v.id("users"),
-		content: v.string(),
-	},
-	handler: async (ctx, args) => {
-		const commentId = await ctx.db.insert("comments", {
-			suggestionId: args.suggestionId,
-			userId: args.userId,
-			content: args.content,
-			createdAt: Date.now(),
-		});
-		return commentId;
-	},
-});
-
-export const getCommentsBySuggestion = query({
-	args: { suggestionId: v.id("titleSuggestions") },
-	handler: async (ctx, args) => {
-		const comments = await ctx.db
-			.query("comments")
-			.withIndex("by_suggestion", (q) =>
-				q.eq("suggestionId", args.suggestionId)
-			)
-			.collect();
-		return comments;
 	},
 });
