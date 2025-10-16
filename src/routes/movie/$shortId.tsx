@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
+import { useEffect } from "react";
 import { api } from "../../../convex/_generated/api";
 import { MovieInfo } from "../../components/movie/MovieInfo";
 
@@ -10,6 +11,16 @@ export const Route = createFileRoute("/movie/$shortId")({
 function MoviePage() {
 	const { shortId } = Route.useParams();
 	const movie = useQuery(api.movies.getMovieByShortId, { shortId });
+	const incrementViewCount = useMutation(api.movies.incrementViewCount);
+
+	// Increment view count when movie is loaded
+	useEffect(() => {
+		if (movie?._id) {
+			incrementViewCount({ movieId: movie._id }).catch((error) => {
+				console.error("Failed to increment view count:", error);
+			});
+		}
+	}, [movie?._id, incrementViewCount]);
 
 	if (movie === undefined) {
 		return (
