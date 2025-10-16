@@ -37,6 +37,8 @@ export default function Pagination({
 
 	const pageNumbers = getPageNumbers();
 
+	const lastPageNumber = pageNumbers.at(-1);
+
 	return (
 		<div className="flex justify-center gap-2">
 			<div className="join">
@@ -92,10 +94,10 @@ export default function Pagination({
 
 				{/* Last page if not visible */}
 				{pageNumbers.length > 0 &&
-					pageNumbers.at(-1) !== undefined &&
-					pageNumbers.at(-1)! < totalPages && (
+					lastPageNumber !== undefined &&
+					lastPageNumber < totalPages && (
 						<>
-							{pageNumbers.at(-1)! < totalPages - 1 && (
+							{lastPageNumber < totalPages - 1 && (
 								<button
 									className="btn btn-disabled btn-sm join-item"
 									type="button"
