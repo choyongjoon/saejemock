@@ -11,6 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MoviesTrendingRouteImport } from './routes/movies/trending'
+import { Route as MoviesRecentRouteImport } from './routes/movies/recent'
+import { Route as MoviesPopularRouteImport } from './routes/movies/popular'
 import { Route as MovieSearchRouteImport } from './routes/movie/search'
 import { Route as MovieShortIdRouteImport } from './routes/movie/$shortId'
 
@@ -22,6 +25,21 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MoviesTrendingRoute = MoviesTrendingRouteImport.update({
+  id: '/movies/trending',
+  path: '/movies/trending',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MoviesRecentRoute = MoviesRecentRouteImport.update({
+  id: '/movies/recent',
+  path: '/movies/recent',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MoviesPopularRoute = MoviesPopularRouteImport.update({
+  id: '/movies/popular',
+  path: '/movies/popular',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MovieSearchRoute = MovieSearchRouteImport.update({
@@ -40,12 +58,18 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/movie/$shortId': typeof MovieShortIdRoute
   '/movie/search': typeof MovieSearchRoute
+  '/movies/popular': typeof MoviesPopularRoute
+  '/movies/recent': typeof MoviesRecentRoute
+  '/movies/trending': typeof MoviesTrendingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/privacy': typeof PrivacyRoute
   '/movie/$shortId': typeof MovieShortIdRoute
   '/movie/search': typeof MovieSearchRoute
+  '/movies/popular': typeof MoviesPopularRoute
+  '/movies/recent': typeof MoviesRecentRoute
+  '/movies/trending': typeof MoviesTrendingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +77,38 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/movie/$shortId': typeof MovieShortIdRoute
   '/movie/search': typeof MovieSearchRoute
+  '/movies/popular': typeof MoviesPopularRoute
+  '/movies/recent': typeof MoviesRecentRoute
+  '/movies/trending': typeof MoviesTrendingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/privacy' | '/movie/$shortId' | '/movie/search'
+  fullPaths:
+    | '/'
+    | '/privacy'
+    | '/movie/$shortId'
+    | '/movie/search'
+    | '/movies/popular'
+    | '/movies/recent'
+    | '/movies/trending'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/privacy' | '/movie/$shortId' | '/movie/search'
-  id: '__root__' | '/' | '/privacy' | '/movie/$shortId' | '/movie/search'
+  to:
+    | '/'
+    | '/privacy'
+    | '/movie/$shortId'
+    | '/movie/search'
+    | '/movies/popular'
+    | '/movies/recent'
+    | '/movies/trending'
+  id:
+    | '__root__'
+    | '/'
+    | '/privacy'
+    | '/movie/$shortId'
+    | '/movie/search'
+    | '/movies/popular'
+    | '/movies/recent'
+    | '/movies/trending'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +116,9 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   MovieShortIdRoute: typeof MovieShortIdRoute
   MovieSearchRoute: typeof MovieSearchRoute
+  MoviesPopularRoute: typeof MoviesPopularRoute
+  MoviesRecentRoute: typeof MoviesRecentRoute
+  MoviesTrendingRoute: typeof MoviesTrendingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -83,6 +135,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/movies/trending': {
+      id: '/movies/trending'
+      path: '/movies/trending'
+      fullPath: '/movies/trending'
+      preLoaderRoute: typeof MoviesTrendingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/movies/recent': {
+      id: '/movies/recent'
+      path: '/movies/recent'
+      fullPath: '/movies/recent'
+      preLoaderRoute: typeof MoviesRecentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/movies/popular': {
+      id: '/movies/popular'
+      path: '/movies/popular'
+      fullPath: '/movies/popular'
+      preLoaderRoute: typeof MoviesPopularRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/movie/search': {
@@ -107,6 +180,9 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   MovieShortIdRoute: MovieShortIdRoute,
   MovieSearchRoute: MovieSearchRoute,
+  MoviesPopularRoute: MoviesPopularRoute,
+  MoviesRecentRoute: MoviesRecentRoute,
+  MoviesTrendingRoute: MoviesTrendingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

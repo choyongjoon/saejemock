@@ -50,16 +50,20 @@ type MovieWithVotes = Movie & {
 };
 
 function MoviesSection() {
-	const moviesByVotes = useQuery(api.movies.getMoviesByTotalVotes, {
+	const moviesByVotesData = useQuery(api.movies.getMoviesByTotalVotes, {
 		limit: 5,
 	});
-	const moviesByViews = useQuery(api.movies.getMoviesByViewCount, { limit: 5 });
-	const recentMovies = useQuery(api.movies.getMoviesByCreatedAt, { limit: 5 });
+	const moviesByViewsData = useQuery(api.movies.getMoviesByViewCount, {
+		limit: 5,
+	});
+	const recentMoviesData = useQuery(api.movies.getMoviesByCreatedAt, {
+		limit: 5,
+	});
 
 	const isLoading =
-		moviesByVotes === undefined ||
-		moviesByViews === undefined ||
-		recentMovies === undefined;
+		moviesByVotesData === undefined ||
+		moviesByViewsData === undefined ||
+		recentMoviesData === undefined;
 
 	if (isLoading) {
 		return (
@@ -69,13 +73,20 @@ function MoviesSection() {
 		);
 	}
 
+	const moviesByVotes = moviesByVotesData.movies;
+	const moviesByViews = moviesByViewsData.movies;
+	const recentMovies = recentMoviesData.movies;
+
 	return (
 		<div className="space-y-16">
 			{/* Movies by Total Votes */}
 			{moviesByVotes.length > 0 && (
 				<section>
-					<div className="mb-6 flex items-center gap-3">
+					<div className="mb-6 flex items-center justify-between">
 						<h2 className="font-bold text-3xl">투표가 많은 영화</h2>
+						<Link className="link-hover link text-sm" to="/movies/popular">
+							더보기 →
+						</Link>
 					</div>
 					<div className="grid grid-cols-1 gap-2">
 						{moviesByVotes.map((movie: MovieWithVotes) => (
@@ -88,8 +99,11 @@ function MoviesSection() {
 			{/* Movies by View Count */}
 			{moviesByViews.length > 0 && (
 				<section>
-					<div className="mb-6 flex items-center gap-3">
+					<div className="mb-6 flex items-center justify-between">
 						<h2 className="font-bold text-3xl">조회수가 높은 영화</h2>
+						<Link className="link-hover link text-sm" to="/movies/trending">
+							더보기 →
+						</Link>
 					</div>
 					<div className="grid grid-cols-1 gap-2">
 						{moviesByViews.map((movie: Movie) => (
@@ -102,8 +116,11 @@ function MoviesSection() {
 			{/* Recently Added Movies */}
 			{recentMovies.length > 0 && (
 				<section>
-					<div className="mb-6 flex items-center gap-3">
+					<div className="mb-6 flex items-center justify-between">
 						<h2 className="font-bold text-3xl">신규 추가 영화</h2>
+						<Link className="link-hover link text-sm" to="/movies/recent">
+							더보기 →
+						</Link>
 					</div>
 					<div className="grid grid-cols-1 gap-2">
 						{recentMovies.map((movie: Movie) => (

@@ -61,28 +61,56 @@ export const getMovieByShortId = query({
 });
 
 export const getMoviesByViewCount = query({
-	args: { limit: v.optional(v.number()) },
+	args: {
+		limit: v.optional(v.number()),
+		page: v.optional(v.number()),
+	},
 	handler: async (ctx, args) => {
 		const limit = args.limit ?? 10;
-		const movies = await ctx.db
+		const page = args.page ?? 1;
+		const skip = (page - 1) * limit;
+
+		const allMovies = await ctx.db
 			.query("movies")
 			.withIndex("by_viewCount")
 			.order("desc")
-			.take(limit);
-		return movies;
+			.collect();
+
+		const paginatedMovies = allMovies.slice(skip, skip + limit);
+
+		return {
+			movies: paginatedMovies,
+			totalCount: allMovies.length,
+			page,
+			totalPages: Math.ceil(allMovies.length / limit),
+		};
 	},
 });
 
 export const getMoviesByCreatedAt = query({
-	args: { limit: v.optional(v.number()) },
+	args: {
+		limit: v.optional(v.number()),
+		page: v.optional(v.number()),
+	},
 	handler: async (ctx, args) => {
 		const limit = args.limit ?? 10;
-		const movies = await ctx.db
+		const page = args.page ?? 1;
+		const skip = (page - 1) * limit;
+
+		const allMovies = await ctx.db
 			.query("movies")
 			.withIndex("by_createdAt")
 			.order("desc")
-			.take(limit);
-		return movies;
+			.collect();
+
+		const paginatedMovies = allMovies.slice(skip, skip + limit);
+
+		return {
+			movies: paginatedMovies,
+			totalCount: allMovies.length,
+			page,
+			totalPages: Math.ceil(allMovies.length / limit),
+		};
 	},
 });
 
@@ -90,9 +118,14 @@ export const getMoviesByCreatedAt = query({
  * Get movies sorted by total votes across all title suggestions
  */
 export const getMoviesByTotalVotes = query({
-	args: { limit: v.optional(v.number()) },
+	args: {
+		limit: v.optional(v.number()),
+		page: v.optional(v.number()),
+	},
 	handler: async (ctx, args) => {
 		const limit = args.limit ?? 10;
+		const page = args.page ?? 1;
+		const skip = (page - 1) * limit;
 
 		// Get all movies
 		const movies = await ctx.db.query("movies").collect();
@@ -117,10 +150,20 @@ export const getMoviesByTotalVotes = query({
 			})
 		);
 
-		// Sort by total votes and return top N
-		return moviesWithVotes
-			.sort((a, b) => b.totalVotes - a.totalVotes)
-			.slice(0, limit);
+		// Sort by total votes
+		const sortedMovies = moviesWithVotes.sort(
+			(a, b) => b.totalVotes - a.totalVotes
+		);
+
+		// Apply pagination
+		const paginatedMovies = sortedMovies.slice(skip, skip + limit);
+
+		return {
+			movies: paginatedMovies,
+			totalCount: sortedMovies.length,
+			page,
+			totalPages: Math.ceil(sortedMovies.length / limit),
+		};
 	},
 });
 
