@@ -1,23 +1,10 @@
-import type { MergedMovie } from "../components/movie/MovieResultCard";
-import type { KobisMovie } from "../types/movie";
-
-type DbMovie = {
-	_id: string;
-	shortId: string;
-	originalTitle: string;
-	koreanTitle?: string;
-	releaseDate?: string;
-	kobisMovieCode?: string;
-	year?: string;
-	directors?: string;
-	additionalInfo?: string;
-};
+import type { KobisMovie, Movie, SearchedMovieInfo } from "../types/movie";
 
 export function useMergedResults(
-	dbResults: DbMovie[] | undefined,
+	dbResults: Movie[] | undefined,
 	kobisResults: KobisMovie[]
-): MergedMovie[] {
-	const mergedResults: MergedMovie[] = [];
+): SearchedMovieInfo[] {
+	const mergedResults: SearchedMovieInfo[] = [];
 	const addedMovieCodes = new Set<string>();
 
 	// Add DB results first
@@ -27,7 +14,8 @@ export function useMergedResults(
 				source: "db",
 				inDB: true,
 				shortId: movie.shortId,
-				koreanTitle: movie.koreanTitle || movie.originalTitle,
+				koreanTitle: movie.koreanTitle,
+				englishTitle: movie.englishTitle,
 				originalTitle: movie.originalTitle,
 				year: movie.year,
 				directors: movie.directors,
@@ -48,7 +36,8 @@ export function useMergedResults(
 				inDB: false,
 				movieCd: movie.movieCd,
 				koreanTitle: movie.movieNm,
-				originalTitle: movie.movieNmEn || movie.movieNm,
+				englishTitle: movie.movieNmEn,
+				originalTitle: "",
 				year: movie.prdtYear,
 				directors: movie.directors,
 				additionalInfo: [movie.nationAlt, movie.genreAlt]

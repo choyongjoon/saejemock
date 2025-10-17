@@ -1,14 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import type { Movie } from "@/types/movie";
+import type { MovieInfo } from "@/types/movie";
 
 type MovieCardAsLinkProps = {
 	mode: "link";
-	movie: Movie;
+	movie: MovieInfo;
 };
 
 type MovieCardAsButtonProps = {
 	mode: "button";
-	movie: Movie;
+	movie: MovieInfo;
 	onClick: () => void;
 	disabled?: boolean;
 	isLoading?: boolean;
@@ -16,7 +16,7 @@ type MovieCardAsButtonProps = {
 
 type MovieCardProps = MovieCardAsLinkProps | MovieCardAsButtonProps;
 
-function MovieCardContent({ movie }: { movie: Movie }) {
+function MovieCardContent({ movie }: { movie: MovieInfo }) {
 	return (
 		<div className="card-body">
 			{/* Korean Title (Main) */}
@@ -41,7 +41,7 @@ export default function MovieCard(props: MovieCardProps) {
 		return (
 			<Link
 				className="card bg-base-200 transition-all hover:shadow-xl"
-				params={{ shortId: props.movie.shortId }}
+				params={{ shortId: props.movie.shortId || "" }}
 				to="/movie/$shortId"
 			>
 				<MovieCardContent movie={props.movie} />

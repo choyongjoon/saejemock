@@ -1,26 +1,14 @@
 import { useState } from "react";
+import type { MovieInfo } from "@/types/movie";
 import { LoginRequiredModal } from "../common/LoginRequiredModal";
 import MovieCard from "../MovieCard";
 
-export type MergedMovie = {
-	source: "db" | "kobis";
-	inDB: boolean;
-	movieCd?: string;
-	shortId?: string;
-	koreanTitle: string;
-	originalTitle: string;
-	year?: string;
-	directors?: string;
-	additionalInfo?: string;
-	posterUrl?: string;
-};
-
 type MovieResultCardProps = {
-	movie: MergedMovie;
+	movie: MovieInfo & { inDB: boolean };
 	index: number;
 	isAdding: boolean;
 	isSignedIn: boolean;
-	onMovieClick: (movie: MergedMovie) => void;
+	onMovieClick: (movie: MovieInfo) => void;
 };
 
 export function MovieResultCard({
@@ -53,13 +41,7 @@ export function MovieResultCard({
 			<MovieCard
 				isLoading={isAdding}
 				mode="button"
-				movie={{
-					koreanTitle: movie.koreanTitle,
-					originalTitle: movie.originalTitle,
-					year: movie.year,
-					directors: movie.directors,
-					additionalInfo: movie.additionalInfo,
-				}}
+				movie={movie}
 				onClick={handleCardClick}
 			/>
 

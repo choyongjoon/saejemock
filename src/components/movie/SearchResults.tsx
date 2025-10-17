@@ -1,15 +1,15 @@
 import { Film, Search } from "lucide-react";
-import type { MergedMovie } from "./MovieResultCard";
 import { MovieResultCard } from "./MovieResultCard";
+import type { MovieInfo, SearchedMovieInfo } from "@/types/movie";
 
 type SearchResultsProps = {
 	isLoading: boolean;
 	debouncedQuery: string;
-	mergedResults: MergedMovie[];
+	mergedResults: SearchedMovieInfo[];
 	isAdding: boolean;
 	isSignedIn: boolean;
 	errorMessage: string | null;
-	onMovieClick: (movie: MergedMovie) => void;
+	onMovieClick: (movie: MovieInfo) => void;
 };
 
 export function SearchResults({

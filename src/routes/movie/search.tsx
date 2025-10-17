@@ -5,12 +5,11 @@ import { Film } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { api } from "../../../convex/_generated/api";
-import type { MergedMovie } from "../../components/movie/MovieResultCard";
 import { SearchForm } from "../../components/movie/SearchForm";
 import { SearchResults } from "../../components/movie/SearchResults";
 import { useMergedResults } from "../../hooks/useMergedResults";
 import { useMovieSearch } from "../../hooks/useMovieSearch";
-import type { SearchType } from "../../types/movie";
+import type { MovieInfo, SearchType } from "../../types/movie";
 
 const movieAddSearchSchema = z.object({
 	q: z.string().optional(),
@@ -85,14 +84,14 @@ function SearchMoviePage() {
 		});
 	};
 
-	const handleMovieClick = async (movie: MergedMovie) => {
-		if (movie.inDB && movie.shortId) {
+	const handleMovieClick = async (movie: MovieInfo) => {
+		if (movie.shortId) {
 			// Navigate to existing movie
 			await navigate({
 				to: "/movie/$shortId",
 				params: { shortId: movie.shortId },
 			});
-		} else if (!movie.inDB && movie.movieCd && isSignedIn) {
+		} else if (movie.movieCd && isSignedIn) {
 			// Add movie to DB
 			setIsAdding(true);
 			try {
