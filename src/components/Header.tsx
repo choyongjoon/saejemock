@@ -54,10 +54,7 @@ export default function Header() {
 					>
 						<Settings className="h-5 w-5" />
 					</button>
-					<ul
-						className="menu dropdown-content z-10 w-52 rounded-box bg-base-100 p-2 shadow"
-						tabIndex={0}
-					>
+					<ul className="menu dropdown-content z-10 w-52 rounded-box bg-base-100 p-2 shadow">
 						<li className="menu-title">테마</li>
 						<li>
 							<button

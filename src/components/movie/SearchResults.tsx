@@ -1,6 +1,6 @@
 import { Film, Search } from "lucide-react";
-import { MovieResultCard } from "./MovieResultCard";
 import type { MovieInfo, SearchedMovieInfo } from "@/types/movie";
+import { MovieResultCard } from "./MovieResultCard";
 
 type SearchResultsProps = {
 	isLoading: boolean;
