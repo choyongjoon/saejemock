@@ -1,6 +1,6 @@
 import { TableAggregate } from "@convex-dev/aggregate";
-import type { DataModel } from "./_generated/dataModel";
 import { components } from "./_generated/api";
+import type { DataModel } from "./_generated/dataModel";
 
 // Aggregate for movies sorted by view count (descending)
 // Using negative value to sort in descending order

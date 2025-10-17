@@ -37,9 +37,9 @@ export default function Header() {
 	};
 
 	return (
-		<div className="navbar bg-base-200 shadow-lg px-4">
+		<div className="navbar bg-base-200 px-4 shadow-lg">
 			<div className="navbar-start">
-				<Link className="btn btn-ghost text-xl px-0" to="/">
+				<Link className="btn btn-ghost px-0 text-xl" to="/">
 					<Clapperboard className="h-6 w-6" />새 제목
 				</Link>
 			</div>

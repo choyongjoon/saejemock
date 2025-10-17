@@ -1,5 +1,5 @@
 import { SignInButton, useUser } from "@clerk/clerk-react";
-import { ChangeEvent, useState } from "react";
+import { type ChangeEvent, useState } from "react";
 
 type AddSuggestionFormProps = {
 	onSubmit: (
@@ -70,7 +70,7 @@ export function AddSuggestionForm({ onSubmit }: AddSuggestionFormProps) {
 					<legend className="fieldset-legend">제목</legend>
 					<input
 						autoFocus
-						className="input text-base w-full"
+						className="input w-full text-base"
 						onChange={handleChangeTitle}
 						required
 						type="text"
@@ -81,13 +81,13 @@ export function AddSuggestionForm({ onSubmit }: AddSuggestionFormProps) {
 				<fieldset className="fieldset">
 					<legend className="fieldset-legend">설명 (선택)</legend>
 					<textarea
-						className="textarea text-base w-full"
+						className="textarea w-full text-base"
 						onChange={(e) => setNewDescription(e.target.value)}
 						rows={3}
 						value={newDescription}
 					/>
 				</fieldset>
-				<div className="flex gap-2 mt-2">
+				<div className="mt-2 flex gap-2">
 					<button
 						className="btn btn-warning"
 						onClick={handleCancel}

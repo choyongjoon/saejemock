@@ -1,14 +1,15 @@
-import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import type { QueryClient } from "@tanstack/react-query";
+import {
+	createRootRouteWithContext,
+	HeadContent,
+	Scripts,
+} from "@tanstack/react-router";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
-
 import ClerkProvider from "../integrations/clerk/provider";
 import ConvexProvider from "../integrations/convex/provider";
 import PosthogProvider from "../integrations/posthog/provider";
-
 import appCss from "../styles.css?url";
-import { createRootRouteWithContext } from "@tanstack/react-router";
-import type { QueryClient } from "@tanstack/react-query";
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
@@ -52,7 +53,7 @@ export const Route = createRootRouteWithContext<{
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
-		<html data-theme="black" lang="ko">
+		<html lang="ko">
 			<head>
 				<HeadContent />
 				<script
