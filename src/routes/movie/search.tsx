@@ -68,6 +68,7 @@ function SearchMoviePage() {
 		await navigate({
 			to: "/movie/search",
 			search: { q: query, type: searchType },
+			replace: true,
 		});
 
 		setDebouncedQuery(query);
@@ -81,6 +82,7 @@ function SearchMoviePage() {
 		navigate({
 			to: "/movie/search",
 			search: {},
+			replace: true,
 		});
 	};
 
