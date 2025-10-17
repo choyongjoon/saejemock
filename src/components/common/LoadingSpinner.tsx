@@ -8,9 +8,9 @@ export default function LoadingSpinner({
 	size = "lg",
 }: LoadingSpinnerProps) {
 	const sizeClass = {
-		sm: "h-8 w-8",
-		md: "h-10 w-10",
-		lg: "h-12 w-12",
+		sm: "loading-sm",
+		md: "loading-md",
+		lg: "loading-lg",
 	}[size];
 
 	const containerClass = fullScreen
@@ -19,9 +19,7 @@ export default function LoadingSpinner({
 
 	return (
 		<div className={containerClass}>
-			<div
-				className={`${sizeClass} animate-spin rounded-full border-gray-900 border-b-2`}
-			/>
+			<div className={`loading loading-spinner ${sizeClass}`} />
 		</div>
 	);
 }
