@@ -44,13 +44,14 @@ export function SearchForm({
 			<div className="join w-full">
 				<div className="relative flex-1">
 					<input
+						autoFocus
 						className="input input-bordered w-full pr-10"
 						disabled={isLoading}
 						onChange={(e) => onSearchQueryChange(e.target.value)}
 						placeholder={
 							searchType === "director"
-								? "감독 이름을 입력하세요"
-								: "영화 제목을 입력하세요 (한글 또는 영어)"
+								? "한국어 이름"
+								: "한국어 제목 또는 원제목"
 						}
 						type="text"
 						value={searchQuery}
