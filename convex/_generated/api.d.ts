@@ -11,7 +11,6 @@
 import type * as aggregates from "../aggregates.js";
 import type * as http from "../http.js";
 import type * as kobis from "../kobis.js";
-import type * as migrations from "../migrations.js";
 import type * as movies from "../movies.js";
 import type * as shortId from "../shortId.js";
 import type * as titleSuggestions from "../titleSuggestions.js";
@@ -35,7 +34,6 @@ declare const fullApi: ApiFromModules<{
   aggregates: typeof aggregates;
   http: typeof http;
   kobis: typeof kobis;
-  migrations: typeof migrations;
   movies: typeof movies;
   shortId: typeof shortId;
   titleSuggestions: typeof titleSuggestions;
