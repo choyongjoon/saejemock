@@ -5,7 +5,7 @@ import { ConvexProviderWithClerk } from "convex/react-clerk";
 
 const CONVEX_URL = import.meta.env.VITE_CONVEX_URL;
 const convexQueryClient = new ConvexQueryClient(CONVEX_URL);
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
 			queryKeyHashFn: convexQueryClient.hashFn(),
