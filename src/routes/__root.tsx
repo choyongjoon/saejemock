@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-router";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
+import { ThemeScript } from "../components/ThemeScript";
 import ClerkProvider from "../integrations/clerk/provider";
 import ConvexProvider from "../integrations/convex/provider";
 import PosthogProvider from "../integrations/posthog/provider";
@@ -56,6 +57,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 		<html lang="ko">
 			<head>
 				<HeadContent />
+				<ThemeScript />
 				<script
 					async
 					crossOrigin="anonymous"
