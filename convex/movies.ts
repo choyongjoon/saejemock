@@ -21,6 +21,18 @@ export const addMovie = mutation({
 		createdBy: v.optional(v.id("users")),
 	},
 	handler: async (ctx, args) => {
+		// Check if movie already exists to prevent double insertion
+		const existingMovie = await ctx.db
+			.query("movies")
+			.withIndex("by_kobisMovieCode", (q) =>
+				q.eq("kobisMovieCode", args.kobisMovieCode)
+			)
+			.first();
+
+		if (existingMovie) {
+			return existingMovie._id;
+		}
+
 		const movie = {
 			shortId: args.shortId,
 			originalTitle: args.originalTitle,

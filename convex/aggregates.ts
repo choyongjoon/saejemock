@@ -8,7 +8,7 @@ export const moviesByViewCount = new TableAggregate<{
 	Key: number;
 	DataModel: DataModel;
 	TableName: "movies";
-}>(components.aggregate, {
+}>(components.aggregateByViewCount, {
 	sortKey: (movie) => -movie.viewCount,
 });
 
@@ -18,7 +18,7 @@ export const moviesByTotalVotes = new TableAggregate<{
 	Key: number;
 	DataModel: DataModel;
 	TableName: "movies";
-}>(components.aggregate, {
+}>(components.aggregateByTotalVotes, {
 	sortKey: (movie) => -movie.totalVotes,
 });
 
@@ -28,6 +28,6 @@ export const moviesByCreatedAt = new TableAggregate<{
 	Key: number;
 	DataModel: DataModel;
 	TableName: "movies";
-}>(components.aggregate, {
+}>(components.aggregateByCreatedAt, {
 	sortKey: (movie) => -movie.createdAt,
 });
