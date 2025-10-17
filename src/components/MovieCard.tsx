@@ -49,15 +49,17 @@ export default function MovieCard(props: MovieCardProps) {
 		);
 	}
 
+	// Determine button state classes
+	let stateClasses = "hover:shadow-lg";
+	if (props.isLoading) {
+		stateClasses = "cursor-wait opacity-50";
+	} else if (props.disabled) {
+		stateClasses = "cursor-not-allowed opacity-40";
+	}
+
 	return (
 		<button
-			className={`card w-full bg-base-200 text-left transition-all ${
-				props.isLoading
-					? "cursor-wait opacity-50"
-					: props.disabled
-						? "cursor-not-allowed opacity-40"
-						: "hover:shadow-lg"
-			}`}
+			className={`card w-full bg-base-200 text-left transition-all ${stateClasses}`}
 			disabled={props.disabled || props.isLoading}
 			onClick={props.onClick}
 			type="button"

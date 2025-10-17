@@ -34,6 +34,9 @@
         "noUnknownProperty": "off",
         "noUnknownTypeSelector": "off"
       },
+      "nursery": {
+        "useConsistentTypeDefinitions": "off"
+      },
       "performance": {
         "noImgElement": "off"
       },
