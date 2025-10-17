@@ -1,7 +1,10 @@
+import { convexQuery } from "@convex-dev/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "convex/react";
+import { Suspense } from "react";
 import { z } from "zod";
 import { api } from "../../../convex/_generated/api";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 import Pagination from "../../components/common/Pagination";
 import MovieCard from "../../components/MovieCard";
 import type { Movie } from "../../types/movie";
@@ -12,25 +15,22 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/movies/trending")({
 	validateSearch: (search) => searchSchema.parse(search),
-	component: TrendingMoviesPage,
+	component: TrendingMoviesPageWithSuspense,
 });
+
+function TrendingMoviesPageWithSuspense() {
+	return (
+		<Suspense fallback={<LoadingSpinner />}>
+			<TrendingMoviesPage />
+		</Suspense>
+	);
+}
 
 function TrendingMoviesPage() {
 	const { page } = Route.useSearch();
-	const moviesData = useQuery(api.movies.getMoviesByViewCount, {
-		limit: 20,
-		page,
-	});
-
-	const isLoading = moviesData === undefined;
-
-	if (isLoading) {
-		return (
-			<div className="flex min-h-screen items-center justify-center">
-				<span className="loading loading-spinner loading-lg" />
-			</div>
-		);
-	}
+	const { data: moviesData } = useSuspenseQuery(
+		convexQuery(api.movies.getMoviesByViewCount, { limit: 20, page })
+	);
 
 	const { movies, totalPages } = moviesData;
 

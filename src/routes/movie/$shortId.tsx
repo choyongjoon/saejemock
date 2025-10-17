@@ -1,17 +1,30 @@
+import { convexQuery } from "@convex-dev/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery } from "convex/react";
-import { useEffect } from "react";
+import { useMutation } from "convex/react";
+import { Suspense, useEffect } from "react";
 import { api } from "../../../convex/_generated/api";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { MovieInfo } from "../../components/movie/MovieInfo";
 import { TitleSuggestions } from "../../components/movie/TitleSuggestions";
 
 export const Route = createFileRoute("/movie/$shortId")({
-	component: MoviePage,
+	component: MoviePageWithSuspense,
 });
+
+function MoviePageWithSuspense() {
+	return (
+		<Suspense fallback={<LoadingSpinner />}>
+			<MoviePage />
+		</Suspense>
+	);
+}
 
 function MoviePage() {
 	const { shortId } = Route.useParams();
-	const movie = useQuery(api.movies.getMovieByShortId, { shortId });
+	const { data: movie } = useSuspenseQuery(
+		convexQuery(api.movies.getMovieByShortId, { shortId })
+	);
 	const incrementViewCount = useMutation(api.movies.incrementViewCount);
 
 	// Increment view count when movie is loaded
@@ -22,14 +35,6 @@ function MoviePage() {
 			});
 		}
 	}, [movie?._id, incrementViewCount]);
-
-	if (movie === undefined) {
-		return (
-			<div className="flex min-h-screen items-center justify-center">
-				<div className="h-12 w-12 animate-spin rounded-full border-gray-900 border-b-2" />
-			</div>
-		);
-	}
 
 	if (movie === null) {
 		return (

@@ -1,6 +1,9 @@
+import { convexQuery } from "@convex-dev/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "convex/react";
+import { Suspense } from "react";
 import { api } from "../../convex/_generated/api";
+import LoadingSpinner from "../components/common/LoadingSpinner";
 import MovieCard from "../components/MovieCard";
 import type { Movie } from "../types/movie";
 
@@ -28,35 +31,24 @@ function HomePage() {
 
 			{/* Movies Section */}
 			<div className="container mx-auto px-4 py-16">
-				<MoviesSection />
+				<Suspense fallback={<LoadingSpinner fullScreen={false} />}>
+					<MoviesSection />
+				</Suspense>
 			</div>
 		</div>
 	);
 }
 
 function MoviesSection() {
-	const moviesByVotesData = useQuery(api.movies.getMoviesByTotalVotes, {
-		limit: 5,
-	});
-	const moviesByViewsData = useQuery(api.movies.getMoviesByViewCount, {
-		limit: 5,
-	});
-	const recentMoviesData = useQuery(api.movies.getMoviesByCreatedAt, {
-		limit: 5,
-	});
-
-	const isLoading =
-		moviesByVotesData === undefined ||
-		moviesByViewsData === undefined ||
-		recentMoviesData === undefined;
-
-	if (isLoading) {
-		return (
-			<div className="flex min-h-[400px] items-center justify-center">
-				<span className="loading loading-spinner loading-lg" />
-			</div>
-		);
-	}
+	const { data: moviesByVotesData } = useSuspenseQuery(
+		convexQuery(api.movies.getMoviesByTotalVotes, { limit: 5 })
+	);
+	const { data: moviesByViewsData } = useSuspenseQuery(
+		convexQuery(api.movies.getMoviesByViewCount, { limit: 5 })
+	);
+	const { data: recentMoviesData } = useSuspenseQuery(
+		convexQuery(api.movies.getMoviesByCreatedAt, { limit: 5 })
+	);
 
 	const moviesByVotes = moviesByVotesData.movies;
 	const moviesByViews = moviesByViewsData.movies;
