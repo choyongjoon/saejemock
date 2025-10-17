@@ -57,11 +57,11 @@ export function SearchForm({
 					/>
 					{searchQuery && (
 						<button
-							className="btn btn-circle btn-ghost btn-sm -translate-y-1/2 absolute top-1/2 right-2"
+							className="btn btn-circle btn-ghost absolute top-0 right-2"
 							onClick={onClear}
 							type="button"
 						>
-							<X className="h-4 w-4" />
+							<X className="h-6 w-6" />
 						</button>
 					)}
 				</div>
