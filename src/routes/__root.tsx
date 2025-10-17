@@ -3,8 +3,8 @@ import Footer from "../components/Footer";
 import Header from "../components/Header";
 
 import ClerkProvider from "../integrations/clerk/provider";
-
 import ConvexProvider from "../integrations/convex/provider";
+import PosthogProvider from "../integrations/posthog/provider";
 
 import appCss from "../styles.css?url";
 
@@ -45,24 +45,26 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				/>
 			</head>
 			<body>
-				<ClerkProvider>
-					<ConvexProvider>
-						<Header />
-						<div className="mx-auto max-w-4xl">{children}</div>
-						<Footer />
-						{/*<TanStackDevtools
-							config={{
-								position: "bottom-right",
-							}}
-							plugins={[
-								{
-									name: "Tanstack Router",
-									render: <TanStackRouterDevtoolsPanel />,
-								},
-							]}
-						/>*/}
-					</ConvexProvider>
-				</ClerkProvider>
+				<PosthogProvider>
+					<ClerkProvider>
+						<ConvexProvider>
+							<Header />
+							<div className="mx-auto max-w-4xl">{children}</div>
+							<Footer />
+							{/*<TanStackDevtools
+								config={{
+									position: "bottom-right",
+								}}
+								plugins={[
+									{
+										name: "Tanstack Router",
+										render: <TanStackRouterDevtoolsPanel />,
+									},
+								]}
+							/>*/}
+						</ConvexProvider>
+					</ClerkProvider>
+				</PosthogProvider>
 				<Scripts />
 			</body>
 		</html>
