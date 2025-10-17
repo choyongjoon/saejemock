@@ -6,7 +6,7 @@ type SearchResultsProps = {
 	isLoading: boolean;
 	debouncedQuery: string;
 	mergedResults: SearchedMovieInfo[];
-	isAdding: boolean;
+	addingMovieId: string | null;
 	isSignedIn: boolean;
 	errorMessage: string | null;
 	onMovieClick: (movie: MovieInfo) => void;
@@ -16,7 +16,7 @@ export function SearchResults({
 	isLoading,
 	debouncedQuery,
 	mergedResults,
-	isAdding,
+	addingMovieId,
 	isSignedIn,
 	errorMessage,
 	onMovieClick,
@@ -68,8 +68,11 @@ export function SearchResults({
 				<div className="space-y-2">
 					{mergedResults.map((movie, index) => (
 						<MovieResultCard
+							disabled={
+								addingMovieId !== null && addingMovieId !== movie.movieCd
+							}
 							index={index}
-							isAdding={isAdding}
+							isAdding={addingMovieId === movie.movieCd}
 							isSignedIn={isSignedIn}
 							key={`${movie.source}-${movie.shortId || movie.movieCd || index}`}
 							movie={movie}

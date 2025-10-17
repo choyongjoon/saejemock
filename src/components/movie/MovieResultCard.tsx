@@ -7,6 +7,7 @@ type MovieResultCardProps = {
 	movie: MovieInfo & { inDB: boolean };
 	index: number;
 	isAdding: boolean;
+	disabled?: boolean;
 	isSignedIn: boolean;
 	onMovieClick: (movie: MovieInfo) => void;
 };
@@ -14,6 +15,7 @@ type MovieResultCardProps = {
 export function MovieResultCard({
 	movie,
 	isAdding,
+	disabled,
 	isSignedIn,
 	onMovieClick,
 }: MovieResultCardProps) {
@@ -39,6 +41,7 @@ export function MovieResultCard({
 	return (
 		<>
 			<MovieCard
+				disabled={disabled}
 				isLoading={isAdding}
 				mode="button"
 				movie={movie}

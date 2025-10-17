@@ -32,7 +32,7 @@ function SearchMoviePage() {
 	const [debouncedType, setDebouncedType] = useState<SearchType>(
 		type || "title"
 	);
-	const [isAdding, setIsAdding] = useState(false);
+	const [addingMovieId, setAddingMovieId] = useState<string | null>(null);
 
 	const { kobisResults, isSearchingKobis, errorMessage, performSearch } =
 		useMovieSearch();
@@ -95,7 +95,7 @@ function SearchMoviePage() {
 			});
 		} else if (movie.movieCd && isSignedIn) {
 			// Add movie to DB
-			setIsAdding(true);
+			setAddingMovieId(movie.movieCd);
 			try {
 				const result = await addMovieFromKobis({
 					movieCd: movie.movieCd,
@@ -107,7 +107,7 @@ function SearchMoviePage() {
 			} catch (error) {
 				console.error("Failed to add movie:", error);
 			} finally {
-				setIsAdding(false);
+				setAddingMovieId(null);
 			}
 		}
 	};
@@ -143,9 +143,9 @@ function SearchMoviePage() {
 
 				{/* Search Results */}
 				<SearchResults
+					addingMovieId={addingMovieId}
 					debouncedQuery={debouncedQuery}
 					errorMessage={errorMessage}
-					isAdding={isAdding}
 					isLoading={isLoading}
 					isSignedIn={Boolean(isSignedIn)}
 					mergedResults={mergedResults}
