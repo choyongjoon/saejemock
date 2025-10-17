@@ -52,7 +52,7 @@ export const Route = createRootRouteWithContext<{
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="ko">
+		<html data-theme="black" lang="ko">
 			<head>
 				<HeadContent />
 				<script
