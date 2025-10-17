@@ -115,10 +115,10 @@ export const getMoviesByViewCount = query({
 		// Get the key at the offset position (negative key for descending order)
 		const { key } = await moviesByViewCount.at(ctx, offset);
 
-		// Query from that key (remember key is negative)
+		// Query from that key (use lte for descending order, key is already negative)
 		const movies = await ctx.db
 			.query("movies")
-			.withIndex("by_viewCount", (q) => q.gte("viewCount", -key))
+			.withIndex("by_viewCount", (q) => q.lte("viewCount", -key))
 			.order("desc")
 			.take(limit);
 
@@ -157,10 +157,10 @@ export const getMoviesByCreatedAt = query({
 		// Get the key at the offset position (negative key for descending order)
 		const { key } = await moviesByCreatedAt.at(ctx, offset);
 
-		// Query from that key (remember key is negative)
+		// Query from that key (use lte for descending order, key is already negative)
 		const movies = await ctx.db
 			.query("movies")
-			.withIndex("by_createdAt", (q) => q.gte("createdAt", -key))
+			.withIndex("by_createdAt", (q) => q.lte("createdAt", -key))
 			.order("desc")
 			.take(limit);
 
@@ -203,10 +203,10 @@ export const getMoviesByTotalVotes = query({
 		// Get the key at the offset position (negative key for descending order)
 		const { key } = await moviesByTotalVotes.at(ctx, offset);
 
-		// Query from that key (remember key is negative)
+		// Query from that key (use lte for descending order, key is already negative)
 		const movies = await ctx.db
 			.query("movies")
-			.withIndex("by_totalVotes", (q) => q.gte("totalVotes", -key))
+			.withIndex("by_totalVotes", (q) => q.lte("totalVotes", -key))
 			.order("desc")
 			.take(limit);
 
