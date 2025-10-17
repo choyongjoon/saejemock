@@ -22,8 +22,6 @@ type TitleSuggestionsProps = {
 	suggestions: TitleSuggestion[];
 };
 
-const TOP_SUGGESTIONS_COUNT = 3;
-
 export function TitleSuggestions({
 	movieId,
 	suggestions,
@@ -94,11 +92,9 @@ export function TitleSuggestions({
 		}
 	};
 
-	const topSuggestions = suggestions.slice(0, TOP_SUGGESTIONS_COUNT);
-
 	return (
 		<ul className="list">
-			{topSuggestions.map((suggestion, index) => (
+			{suggestions.map((suggestion, index) => (
 				<TitleSuggestionCard
 					currentUserId={currentUser?._id}
 					hasVoted={userVote?.suggestionId === suggestion._id}
