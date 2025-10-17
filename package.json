@@ -10,7 +10,8 @@
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "prepare": "husky"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.49.0",
