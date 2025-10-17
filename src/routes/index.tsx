@@ -15,7 +15,7 @@ function HomePage() {
 	return (
 		<div className="min-h-screen bg-base-100">
 			{/* Hero Section */}
-			<div className="hero min-h-[40vh] bg-base-200">
+			<div className="hero min-h-[40vh]">
 				<div className="hero-content text-center">
 					<div className="max-w-3xl">
 						<h1 className="mb-4 font-bold text-5xl">새 제목</h1>
