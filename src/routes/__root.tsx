@@ -29,6 +29,14 @@ export const Route = createRootRoute({
 		],
 		links: [
 			{
+				rel: "preconnect",
+				href: "https://cdn.jsdelivr.net",
+			},
+			{
+				rel: "stylesheet",
+				href: "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css",
+			},
+			{
 				rel: "stylesheet",
 				href: appCss,
 			},
@@ -40,7 +48,7 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="en">
+		<html lang="ko">
 			<head>
 				<HeadContent />
 				<script
