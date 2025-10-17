@@ -1,5 +1,5 @@
 import { SignInButton, useUser } from "@clerk/clerk-react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 type AddSuggestionFormProps = {
 	onSubmit: (
@@ -14,7 +14,6 @@ export function AddSuggestionForm({ onSubmit }: AddSuggestionFormProps) {
 	const [newTitle, setNewTitle] = useState("");
 	const [newDescription, setNewDescription] = useState("");
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
-	const titleInputRef = useRef<HTMLInputElement>(null);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -22,11 +21,6 @@ export function AddSuggestionForm({ onSubmit }: AddSuggestionFormProps) {
 			return;
 		}
 		setErrorMessage(null);
-
-		// Blur input to prevent iOS zoom
-		if (titleInputRef.current) {
-			titleInputRef.current.blur();
-		}
 
 		const result = await onSubmit(
 			newTitle.trim(),
@@ -43,11 +37,6 @@ export function AddSuggestionForm({ onSubmit }: AddSuggestionFormProps) {
 	};
 
 	const handleCancel = () => {
-		// Blur input to prevent iOS zoom
-		if (titleInputRef.current) {
-			titleInputRef.current.blur();
-		}
-
 		setIsAddingNew(false);
 		setNewTitle("");
 		setNewDescription("");
@@ -82,9 +71,8 @@ export function AddSuggestionForm({ onSubmit }: AddSuggestionFormProps) {
 							제목 *
 						</label>
 						<input
-							ref={titleInputRef}
 							autoFocus
-							className="w-full rounded border border-gray-300 px-3 py-2"
+							className="w-full rounded border border-gray-300 px-3 py-2 text-base"
 							id="newTitle"
 							onChange={(e) => setNewTitle(e.target.value)}
 							required
@@ -100,7 +88,7 @@ export function AddSuggestionForm({ onSubmit }: AddSuggestionFormProps) {
 							설명 (선택)
 						</label>
 						<textarea
-							className="w-full rounded border border-gray-300 px-3 py-2"
+							className="w-full rounded border border-gray-300 px-3 py-2 text-base"
 							id="newDescription"
 							onChange={(e) => setNewDescription(e.target.value)}
 							rows={3}

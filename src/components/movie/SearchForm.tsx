@@ -45,7 +45,7 @@ export function SearchForm({
 				<div className="relative flex-1">
 					<input
 						autoFocus
-						className="input input-bordered w-full pr-10"
+						className="input input-bordered w-full pr-10 text-base"
 						disabled={isLoading}
 						onChange={(e) => onSearchQueryChange(e.target.value)}
 						placeholder={
