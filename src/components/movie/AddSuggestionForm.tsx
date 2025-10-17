@@ -1,5 +1,5 @@
 import { SignInButton, useUser } from "@clerk/clerk-react";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 type AddSuggestionFormProps = {
 	onSubmit: (
@@ -31,8 +31,12 @@ export function AddSuggestionForm({ onSubmit }: AddSuggestionFormProps) {
 			setNewTitle("");
 			setNewDescription("");
 			setIsAddingNew(false);
+		} else if (
+			result.error?.includes("A suggestion with this title already exists")
+		) {
+			setErrorMessage("이미 같은 제안이 존재합니다.");
 		} else {
-			setErrorMessage(result.error || "Failed to add suggestion");
+			setErrorMessage("제안 추가에 실패했습니다.");
 		}
 	};
 
@@ -40,6 +44,11 @@ export function AddSuggestionForm({ onSubmit }: AddSuggestionFormProps) {
 		setIsAddingNew(false);
 		setNewTitle("");
 		setNewDescription("");
+		setErrorMessage(null);
+	};
+
+	const handleChangeTitle = (e: ChangeEvent<HTMLInputElement>) => {
+		setNewTitle(e.target.value);
 		setErrorMessage(null);
 	};
 
@@ -55,65 +64,47 @@ export function AddSuggestionForm({ onSubmit }: AddSuggestionFormProps) {
 
 	if (isAddingNew) {
 		return (
-			<li className="flex list-row">
-				<form className="card w-full" onSubmit={handleSubmit}>
-					<h4 className="mb-4 font-semibold text-lg">새로운 제목 제안</h4>
-					{errorMessage && (
-						<div className="alert alert-error mb-4">
-							<span>{errorMessage}</span>
-						</div>
-					)}
-					<div className="mb-4">
-						<label
-							className="mb-2 block font-medium text-sm"
-							htmlFor="newTitle"
-						>
-							제목 *
-						</label>
-						<input
-							autoFocus
-							className="w-full rounded border border-gray-300 px-3 py-2 text-base"
-							id="newTitle"
-							onChange={(e) => setNewTitle(e.target.value)}
-							required
-							type="text"
-							value={newTitle}
-						/>
-					</div>
-					<div className="mb-4">
-						<label
-							className="mb-2 block font-medium text-sm"
-							htmlFor="newDescription"
-						>
-							설명 (선택)
-						</label>
-						<textarea
-							className="w-full rounded border border-gray-300 px-3 py-2 text-base"
-							id="newDescription"
-							onChange={(e) => setNewDescription(e.target.value)}
-							rows={3}
-							value={newDescription}
-						/>
-					</div>
-					<div className="flex gap-2">
-						<button
-							className="btn btn-warning"
-							onClick={handleCancel}
-							type="button"
-						>
-							취소
-						</button>
-						<button className="btn btn-primary flex-1" type="submit">
-							제안하기
-						</button>
-					</div>
-				</form>
-			</li>
+			<form className="card w-full py-2" onSubmit={handleSubmit}>
+				<h4 className="font-semibold text-lg">새 제목 제안</h4>
+				<fieldset className="fieldset">
+					<legend className="fieldset-legend">제목</legend>
+					<input
+						autoFocus
+						className="input text-base w-full"
+						onChange={handleChangeTitle}
+						required
+						type="text"
+						value={newTitle}
+					/>
+					<p className="label h-4.5">{errorMessage}</p>
+				</fieldset>
+				<fieldset className="fieldset">
+					<legend className="fieldset-legend">설명 (선택)</legend>
+					<textarea
+						className="textarea text-base w-full"
+						onChange={(e) => setNewDescription(e.target.value)}
+						rows={3}
+						value={newDescription}
+					/>
+				</fieldset>
+				<div className="flex gap-2 mt-2">
+					<button
+						className="btn btn-warning"
+						onClick={handleCancel}
+						type="button"
+					>
+						취소
+					</button>
+					<button className="btn btn-primary flex-1" type="submit">
+						제안하기
+					</button>
+				</div>
+			</form>
 		);
 	}
 
 	return (
-		<li className="flex list-row">
+		<li className="flex list-row px-0">
 			<button
 				className="btn btn-dash w-full"
 				onClick={() => setIsAddingNew(true)}

@@ -37,9 +37,9 @@ export default function Header() {
 	};
 
 	return (
-		<div className="navbar bg-base-200 shadow-lg">
+		<div className="navbar bg-base-200 shadow-lg px-4">
 			<div className="navbar-start">
-				<Link className="btn btn-ghost text-xl" to="/">
+				<Link className="btn btn-ghost text-xl px-0" to="/">
 					<Clapperboard className="h-6 w-6" />새 제목
 				</Link>
 			</div>
@@ -58,7 +58,7 @@ export default function Header() {
 						<li className="menu-title">테마</li>
 						<li>
 							<button
-								className={theme === "system" ? "active" : ""}
+								className={theme === "system" ? "menu-active" : ""}
 								onClick={() => handleThemeChange("system")}
 								type="button"
 							>
@@ -67,7 +67,7 @@ export default function Header() {
 						</li>
 						<li>
 							<button
-								className={theme === "lofi" ? "active" : ""}
+								className={theme === "lofi" ? "menu-active" : ""}
 								onClick={() => handleThemeChange("lofi")}
 								type="button"
 							>
@@ -76,7 +76,7 @@ export default function Header() {
 						</li>
 						<li>
 							<button
-								className={theme === "black" ? "active" : ""}
+								className={theme === "black" ? "menu-active" : ""}
 								onClick={() => handleThemeChange("black")}
 								type="button"
 							>
