@@ -21,6 +21,11 @@ export const Route = createRootRoute({
 			{
 				title: "새 제목",
 			},
+			{
+				name: "description",
+				content:
+					"맘에 안 드는 영화 제목을 고쳐보세요. 영화 제목을 투표하고 새로운 제목을 제안할 수 있습니다.",
+			},
 		],
 		links: [
 			{

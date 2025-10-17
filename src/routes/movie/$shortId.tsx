@@ -10,6 +10,32 @@ import { TitleSuggestions } from "../../components/movie/TitleSuggestions";
 
 export const Route = createFileRoute("/movie/$shortId")({
 	component: MoviePageWithSuspense,
+	head: ({ loaderData }) => {
+		const movie = loaderData as any;
+		const title = movie?.koreanTitle || movie?.originalTitle || "영화";
+		const description = movie
+			? `${title}의 새로운 제목을 투표하고 제안하세요. ${movie.directors ? `감독: ${movie.directors}` : ""} ${movie.year ? `(${movie.year})` : ""}`.trim()
+			: "영화 제목을 투표하고 새로운 제목을 제안할 수 있습니다.";
+
+		return {
+			meta: [
+				{
+					title: `${title} - 새 제목`,
+				},
+				{
+					name: "description",
+					content: description,
+				},
+			],
+		};
+	},
+	loader: async ({ context, params }) => {
+		const queryClient = (context as any).queryClient;
+		const movie = await queryClient.ensureQueryData(
+			convexQuery(api.movies.getMovieByShortId, { shortId: params.shortId })
+		);
+		return movie;
+	},
 });
 
 function MoviePageWithSuspense() {

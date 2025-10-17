@@ -17,6 +17,18 @@ const movieAddSearchSchema = z.object({
 });
 
 export const Route = createFileRoute("/movie/search")({
+	head: () => ({
+		meta: [
+			{
+				title: "영화 검색 - 새 제목",
+			},
+			{
+				name: "description",
+				content:
+					"영화관입장권통합전산망 오픈 API를 사용하여 영화를 검색하고 새로운 제목을 제안할 수 있습니다. 제목 또는 감독으로 검색 가능합니다.",
+			},
+		],
+	}),
 	component: SearchMoviePage,
 	validateSearch: movieAddSearchSchema,
 });
