@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.xml]'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MoviesTrendingRouteImport } from './routes/movies/trending'
@@ -17,6 +18,11 @@ import { Route as MoviesPopularRouteImport } from './routes/movies/popular'
 import { Route as MovieSearchRouteImport } from './routes/movie/search'
 import { Route as MovieShortIdRouteImport } from './routes/movie/$shortId'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -56,6 +62,7 @@ const MovieShortIdRoute = MovieShortIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/movie/$shortId': typeof MovieShortIdRoute
   '/movie/search': typeof MovieSearchRoute
   '/movies/popular': typeof MoviesPopularRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/movie/$shortId': typeof MovieShortIdRoute
   '/movie/search': typeof MovieSearchRoute
   '/movies/popular': typeof MoviesPopularRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/movie/$shortId': typeof MovieShortIdRoute
   '/movie/search': typeof MovieSearchRoute
   '/movies/popular': typeof MoviesPopularRoute
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/privacy'
+    | '/sitemap.xml'
     | '/movie/$shortId'
     | '/movie/search'
     | '/movies/popular'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/privacy'
+    | '/sitemap.xml'
     | '/movie/$shortId'
     | '/movie/search'
     | '/movies/popular'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/privacy'
+    | '/sitemap.xml'
     | '/movie/$shortId'
     | '/movie/search'
     | '/movies/popular'
@@ -114,6 +126,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PrivacyRoute: typeof PrivacyRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   MovieShortIdRoute: typeof MovieShortIdRoute
   MovieSearchRoute: typeof MovieSearchRoute
   MoviesPopularRoute: typeof MoviesPopularRoute
@@ -123,6 +136,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -178,6 +198,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PrivacyRoute: PrivacyRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   MovieShortIdRoute: MovieShortIdRoute,
   MovieSearchRoute: MovieSearchRoute,
   MoviesPopularRoute: MoviesPopularRoute,
