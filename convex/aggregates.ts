@@ -12,6 +12,16 @@ export const moviesByViewCount = new TableAggregate<{
 	sortKey: (movie) => -movie.viewCount,
 });
 
+// Aggregate for movies sorted by total votes (descending)
+// Using negative value to sort in descending order
+export const moviesByTotalVotes = new TableAggregate<{
+	Key: number;
+	DataModel: DataModel;
+	TableName: "movies";
+}>(components.aggregate, {
+	sortKey: (movie) => -movie.totalVotes,
+});
+
 // Aggregate for movies sorted by creation date (descending)
 // Using negative value to sort in descending order
 export const moviesByCreatedAt = new TableAggregate<{

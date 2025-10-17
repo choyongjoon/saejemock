@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { moviesByTotalVotes } from "./aggregates";
 
 /**
  * Add a title suggestion (requires authentication)
@@ -219,6 +220,20 @@ export const deleteSuggestion = mutation({
 			await ctx.db.delete(comment._id);
 		}
 
+		// Update movie totalVotes before deleting suggestion
+		const oldMovie = await ctx.db.get(suggestion.movieId);
+		if (oldMovie) {
+			await ctx.db.patch(suggestion.movieId, {
+				totalVotes: Math.max(0, oldMovie.totalVotes - suggestion.votesCount),
+			});
+
+			// Update aggregate
+			const updatedMovie = await ctx.db.get(suggestion.movieId);
+			if (updatedMovie) {
+				await moviesByTotalVotes.replace(ctx, oldMovie, updatedMovie);
+			}
+		}
+
 		// Delete the suggestion
 		await ctx.db.delete(args.suggestionId);
 	},
@@ -269,6 +284,20 @@ export const cancelVote = mutation({
 			await ctx.db.patch(args.suggestionId, {
 				votesCount: Math.max(0, suggestion.votesCount - 1),
 			});
+
+			// Update movie totalVotes
+			const oldMovie = await ctx.db.get(suggestion.movieId);
+			if (oldMovie) {
+				await ctx.db.patch(suggestion.movieId, {
+					totalVotes: Math.max(0, oldMovie.totalVotes - 1),
+				});
+
+				// Update aggregate
+				const updatedMovie = await ctx.db.get(suggestion.movieId);
+				if (updatedMovie) {
+					await moviesByTotalVotes.replace(ctx, oldMovie, updatedMovie);
+				}
+			}
 		}
 	},
 });
@@ -339,5 +368,19 @@ export const voteForSuggestion = mutation({
 		await ctx.db.patch(args.suggestionId, {
 			votesCount: suggestion.votesCount + 1,
 		});
+
+		// Update movie totalVotes
+		const oldMovie = await ctx.db.get(suggestion.movieId);
+		if (oldMovie) {
+			await ctx.db.patch(suggestion.movieId, {
+				totalVotes: oldMovie.totalVotes + 1,
+			});
+
+			// Update aggregate
+			const updatedMovie = await ctx.db.get(suggestion.movieId);
+			if (updatedMovie) {
+				await moviesByTotalVotes.replace(ctx, oldMovie, updatedMovie);
+			}
+		}
 	},
 });

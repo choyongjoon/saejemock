@@ -1,7 +1,11 @@
 import { v } from "convex/values";
 import { api } from "./_generated/api";
 import { action, mutation, query } from "./_generated/server";
-import { moviesByCreatedAt, moviesByViewCount } from "./aggregates";
+import {
+	moviesByCreatedAt,
+	moviesByTotalVotes,
+	moviesByViewCount,
+} from "./aggregates";
 
 export const addMovie = mutation({
 	args: {
@@ -28,6 +32,7 @@ export const addMovie = mutation({
 			directors: args.directors,
 			additionalInfo: args.additionalInfo,
 			viewCount: 0,
+			totalVotes: 0,
 			createdAt: Date.now(),
 			createdBy: args.createdBy,
 		};
@@ -38,6 +43,7 @@ export const addMovie = mutation({
 		const insertedMovie = await ctx.db.get(movieId);
 		if (insertedMovie) {
 			await moviesByViewCount.insert(ctx, insertedMovie);
+			await moviesByTotalVotes.insert(ctx, insertedMovie);
 			await moviesByCreatedAt.insert(ctx, insertedMovie);
 		}
 
@@ -156,13 +162,8 @@ export const getMoviesByCreatedAt = query({
 });
 
 /**
- * Get movies sorted by total votes across all title suggestions
- *
- * NOTE: This query is O(n*m) complexity and should be optimized with:
- * 1. A scheduled function to maintain a totalVotes field on movies table
- * 2. Or a separate aggregate component for vote counts per movie
- *
- * Current implementation works for small datasets but will degrade with scale.
+ * Get movies sorted by total votes
+ * Uses denormalized totalVotes field for O(log n) performance
  */
 export const getMoviesByTotalVotes = query({
 	args: {
@@ -172,45 +173,36 @@ export const getMoviesByTotalVotes = query({
 	handler: async (ctx, args) => {
 		const limit = args.limit ?? 10;
 		const page = args.page ?? 1;
-		const skip = (page - 1) * limit;
+		const offset = (page - 1) * limit;
 
-		// TODO: Optimize with denormalized totalVotes field or aggregate component
-		// Get all movies
-		const movies = await ctx.db.query("movies").collect();
+		// Get total count efficiently
+		const totalCount = await moviesByTotalVotes.count(ctx);
 
-		// Calculate total votes for each movie
-		const moviesWithVotes = await Promise.all(
-			movies.map(async (movie) => {
-				const suggestions = await ctx.db
-					.query("titleSuggestions")
-					.withIndex("by_movie", (q) => q.eq("movieId", movie._id))
-					.collect();
+		// If offset is beyond the data, return empty
+		if (offset >= totalCount) {
+			return {
+				movies: [],
+				totalCount,
+				page,
+				totalPages: Math.ceil(totalCount / limit),
+			};
+		}
 
-				const totalVotes = suggestions.reduce(
-					(sum, suggestion) => sum + suggestion.votesCount,
-					0
-				);
+		// Get the key at the offset position (negative key for descending order)
+		const { key } = await moviesByTotalVotes.at(ctx, offset);
 
-				return {
-					...movie,
-					totalVotes,
-				};
-			})
-		);
-
-		// Sort by total votes
-		const sortedMovies = moviesWithVotes.sort(
-			(a, b) => b.totalVotes - a.totalVotes
-		);
-
-		// Apply pagination
-		const paginatedMovies = sortedMovies.slice(skip, skip + limit);
+		// Query from that key (remember key is negative)
+		const movies = await ctx.db
+			.query("movies")
+			.withIndex("by_totalVotes", (q) => q.gte("totalVotes", -key))
+			.order("desc")
+			.take(limit);
 
 		return {
-			movies: paginatedMovies,
-			totalCount: sortedMovies.length,
+			movies,
+			totalCount,
 			page,
-			totalPages: Math.ceil(sortedMovies.length / limit),
+			totalPages: Math.ceil(totalCount / limit),
 		};
 	},
 });

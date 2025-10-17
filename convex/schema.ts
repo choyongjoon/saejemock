@@ -19,11 +19,13 @@ export default defineSchema({
 		directors: v.optional(v.string()),
 		additionalInfo: v.optional(v.string()),
 		viewCount: v.number(),
+		totalVotes: v.number(),
 		createdAt: v.number(),
 		createdBy: v.optional(v.id("users")),
 	})
 		.index("by_shortId", ["shortId"])
 		.index("by_viewCount", ["viewCount"])
+		.index("by_totalVotes", ["totalVotes"])
 		.index("by_createdAt", ["createdAt"])
 		.index("by_kobisMovieCode", ["kobisMovieCode"]),
 	titleSuggestions: defineTable({
