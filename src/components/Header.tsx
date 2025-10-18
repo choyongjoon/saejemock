@@ -1,12 +1,8 @@
-import {
-	SignedIn,
-	SignedOut,
-	SignInButton,
-	UserButton,
-} from "@clerk/clerk-react";
+import { SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
 import { Link } from "@tanstack/react-router";
 import { Clapperboard, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
+import { CustomUserButton } from "./CustomUserButton";
 
 type Theme = "system" | "lofi" | "black";
 
@@ -91,13 +87,7 @@ export default function Header() {
 				</Link>
 
 				<SignedIn>
-					<UserButton
-						appearance={{
-							elements: {
-								avatarBox: "w-10 h-10",
-							},
-						}}
-					/>
+					<CustomUserButton />
 				</SignedIn>
 				<SignedOut>
 					<SignInButton mode="modal">

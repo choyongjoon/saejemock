@@ -384,3 +384,107 @@ export const voteForSuggestion = mutation({
 		}
 	},
 });
+
+/**
+ * Get current user's title suggestions
+ */
+export const getMyTitleSuggestions = query({
+	args: {},
+	handler: async (ctx) => {
+		const identity = await ctx.auth.getUserIdentity();
+		if (!identity) {
+			return [];
+		}
+
+		const user = await ctx.db
+			.query("users")
+			.withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+			.first();
+
+		if (!user) {
+			return [];
+		}
+
+		const suggestions = await ctx.db
+			.query("titleSuggestions")
+			.filter((q) => q.eq(q.field("createdBy"), user._id))
+			.collect();
+
+		// Enrich with movie data
+		const enrichedSuggestions = await Promise.all(
+			suggestions.map(async (suggestion) => {
+				const movie = await ctx.db.get(suggestion.movieId);
+				return {
+					...suggestion,
+					movie: movie
+						? {
+								_id: movie._id,
+								koreanTitle: movie.koreanTitle,
+								originalTitle: movie.originalTitle,
+								shortId: movie.shortId,
+							}
+						: null,
+				};
+			})
+		);
+
+		return enrichedSuggestions.sort((a, b) => b.createdAt - a.createdAt);
+	},
+});
+
+/**
+ * Get suggestions the current user has voted for
+ */
+export const getMyVotedSuggestions = query({
+	args: {},
+	handler: async (ctx) => {
+		const identity = await ctx.auth.getUserIdentity();
+		if (!identity) {
+			return [];
+		}
+
+		const user = await ctx.db
+			.query("users")
+			.withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+			.first();
+
+		if (!user) {
+			return [];
+		}
+
+		const votes = await ctx.db
+			.query("votes")
+			.withIndex("by_user", (q) => q.eq("userId", user._id))
+			.collect();
+
+		// Enrich with suggestion and movie data
+		const enrichedVotes = await Promise.all(
+			votes.map(async (vote) => {
+				const suggestion = await ctx.db.get(vote.suggestionId);
+				if (!suggestion) {
+					return null;
+				}
+
+				const movie = await ctx.db.get(suggestion.movieId);
+				return {
+					...vote,
+					suggestion: {
+						...suggestion,
+						movie: movie
+							? {
+									_id: movie._id,
+									koreanTitle: movie.koreanTitle,
+									originalTitle: movie.originalTitle,
+									shortId: movie.shortId,
+								}
+							: null,
+					},
+				};
+			})
+		);
+
+		return enrichedVotes
+			.filter((vote) => vote !== null)
+			.sort((a, b) => b.createdAt - a.createdAt);
+	},
+});

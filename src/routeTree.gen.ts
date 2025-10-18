@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -18,6 +19,11 @@ import { Route as MoviesPopularRouteImport } from './routes/movies/popular'
 import { Route as MovieSearchRouteImport } from './routes/movie/search'
 import { Route as MovieShortIdRouteImport } from './routes/movie/$shortId'
 
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/movie/$shortId': typeof MovieShortIdRoute
   '/movie/search': typeof MovieSearchRoute
   '/movies/popular': typeof MoviesPopularRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/movie/$shortId': typeof MovieShortIdRoute
   '/movie/search': typeof MovieSearchRoute
   '/movies/popular': typeof MoviesPopularRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/movie/$shortId': typeof MovieShortIdRoute
   '/movie/search': typeof MovieSearchRoute
   '/movies/popular': typeof MoviesPopularRoute
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/privacy'
+    | '/profile'
     | '/movie/$shortId'
     | '/movie/search'
     | '/movies/popular'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/privacy'
+    | '/profile'
     | '/movie/$shortId'
     | '/movie/search'
     | '/movies/popular'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/privacy'
+    | '/profile'
     | '/movie/$shortId'
     | '/movie/search'
     | '/movies/popular'
@@ -127,6 +139,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   PrivacyRoute: typeof PrivacyRoute
+  ProfileRoute: typeof ProfileRoute
   MovieShortIdRoute: typeof MovieShortIdRoute
   MovieSearchRoute: typeof MovieSearchRoute
   MoviesPopularRoute: typeof MoviesPopularRoute
@@ -136,6 +149,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -199,6 +219,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   PrivacyRoute: PrivacyRoute,
+  ProfileRoute: ProfileRoute,
   MovieShortIdRoute: MovieShortIdRoute,
   MovieSearchRoute: MovieSearchRoute,
   MoviesPopularRoute: MoviesPopularRoute,
