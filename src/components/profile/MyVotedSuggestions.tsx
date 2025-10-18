@@ -35,11 +35,12 @@ export function MyVotedSuggestions() {
 							to="/movie/$shortId"
 						>
 							{vote.suggestion.movie.koreanTitle}
-							{vote.suggestion.movie.originalTitle &&
-								` (${vote.suggestion.movie.originalTitle})`}
 						</Link>
 					)}
 					<h3 className="font-bold text-lg">{vote.suggestion.title}</h3>
+					{vote.suggestion.isOfficial && (
+						<p className="text-sm opacity-70">공식</p>
+					)}
 					{vote.suggestion.description && (
 						<p className="text-sm opacity-70">{vote.suggestion.description}</p>
 					)}

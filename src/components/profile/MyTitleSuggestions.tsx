@@ -35,7 +35,6 @@ export function MyTitleSuggestions() {
 							to="/movie/$shortId"
 						>
 							{item.movie.koreanTitle}
-							{item.movie.originalTitle && ` (${item.movie.originalTitle})`}
 						</Link>
 					)}
 					<h3 className="font-bold text-lg">{item.title}</h3>

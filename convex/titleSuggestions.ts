@@ -420,7 +420,6 @@ export const getMyTitleSuggestions = query({
 						? {
 								_id: movie._id,
 								koreanTitle: movie.koreanTitle,
-								originalTitle: movie.originalTitle,
 								shortId: movie.shortId,
 							}
 						: null,
@@ -474,7 +473,6 @@ export const getMyVotedSuggestions = query({
 							? {
 									_id: movie._id,
 									koreanTitle: movie.koreanTitle,
-									originalTitle: movie.originalTitle,
 									shortId: movie.shortId,
 								}
 							: null,
