@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
+import { SignedOut, SignInButton } from "@clerk/clerk-react";
 import { Link } from "@tanstack/react-router";
 import { Clapperboard, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -7,15 +7,21 @@ import { CustomUserButton } from "./CustomUserButton";
 type Theme = "system" | "lofi" | "black";
 
 export default function Header() {
-	const [theme, setTheme] = useState<Theme>(() => {
-		if (typeof window === "undefined") {
-			return "black";
-		}
-		const saved = localStorage.getItem("theme");
-		return (saved as Theme) || "black";
-	});
+	const [theme, setTheme] = useState<Theme>("black");
+	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => {
+		// Read from localStorage after mount to avoid hydration mismatch
+		const saved = localStorage.getItem("theme");
+		setTheme((saved as Theme) || "black");
+		setMounted(true);
+	}, []);
+
+	useEffect(() => {
+		if (!mounted) {
+			return;
+		}
+
 		const root = document.documentElement;
 
 		if (theme === "system") {
@@ -26,7 +32,7 @@ export default function Header() {
 		}
 
 		localStorage.setItem("theme", theme);
-	}, [theme]);
+	}, [theme, mounted]);
 
 	const handleThemeChange = (newTheme: Theme) => {
 		setTheme(newTheme);
@@ -86,12 +92,10 @@ export default function Header() {
 					영화 찾기
 				</Link>
 
-				<SignedIn>
-					<CustomUserButton />
-				</SignedIn>
+				<CustomUserButton />
 				<SignedOut>
 					<SignInButton mode="modal">
-						<button className="btn btn-ghost btn-sm" type="button">
+						<button className="btn btn-ghost btn-sm w-10 p-0" type="button">
 							로그인
 						</button>
 					</SignInButton>
