@@ -25,38 +25,30 @@ export function MyTitleSuggestions() {
 	}
 
 	return (
-		<div className="space-y-4">
+		<ul>
 			{suggestions.map((item) => (
-				<div className="card bg-base-200 shadow-sm" key={item._id}>
-					<div className="card-body">
-						<div className="flex items-start justify-between">
-							<div className="flex-1">
-								<h3 className="card-title text-lg">{item.title}</h3>
-								{item.movie && (
-									<Link
-										className="link link-hover text-sm opacity-70"
-										params={{ shortId: item.movie.shortId }}
-										to="/movie/$shortId"
-									>
-										{item.movie.koreanTitle}
-										{item.movie.originalTitle &&
-											` (${item.movie.originalTitle})`}
-									</Link>
-								)}
-							</div>
-							<div className="text-right">
-								<div className="badge badge-primary">{item.votesCount}표</div>
-								<div className="mt-1 text-xs opacity-60">
-									{new Date(item.createdAt).toLocaleDateString()}
-								</div>
-							</div>
-						</div>
-						{item.description && (
-							<p className="text-sm opacity-70">{item.description}</p>
-						)}
+				<li className="list-row" key={item._id}>
+					{item.movie && (
+						<Link
+							className="link link-hover text-sm underline opacity-70"
+							params={{ shortId: item.movie.shortId }}
+							to="/movie/$shortId"
+						>
+							{item.movie.koreanTitle}
+							{item.movie.originalTitle && ` (${item.movie.originalTitle})`}
+						</Link>
+					)}
+					<h3 className="font-bold text-lg">{item.title}</h3>
+					{item.description && (
+						<p className="text-sm opacity-70">{item.description}</p>
+					)}
+					<div className="flex justify-end">
+						<span className="text-xs opacity-60">
+							{new Date(item.createdAt).toLocaleDateString()}
+						</span>
 					</div>
-				</div>
+				</li>
 			))}
-		</div>
+		</ul>
 	);
 }

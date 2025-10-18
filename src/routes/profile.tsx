@@ -1,16 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AccountTab } from "../components/profile/AccountTab";
-import { HistoryTab } from "../components/profile/HistoryTab";
+import { MyTitleSuggestions } from "../components/profile/MyTitleSuggestions";
+import { MyVotedSuggestions } from "../components/profile/MyVotedSuggestions";
 
 export const Route = createFileRoute("/profile")({
 	component: ProfilePage,
 });
 
-type Tab = "history" | "account";
+type Tab = "suggestions" | "votes" | "account";
 
 function ProfilePage() {
-	const [activeTab, setActiveTab] = useState<Tab>("history");
+	const [activeTab, setActiveTab] = useState<Tab>("suggestions");
 
 	return (
 		<div className="container mx-auto max-w-4xl p-4">
@@ -19,13 +20,20 @@ function ProfilePage() {
 			</div>
 
 			<div className="mb-6">
-				<div className="tabs tabs-boxed">
+				<div className="tabs tabs-border">
 					<button
-						className={`tab ${activeTab === "history" ? "tab-active" : ""}`}
-						onClick={() => setActiveTab("history")}
+						className={`tab ${activeTab === "suggestions" ? "tab-active" : ""}`}
+						onClick={() => setActiveTab("suggestions")}
 						type="button"
 					>
-						기록
+						제안
+					</button>
+					<button
+						className={`tab ${activeTab === "votes" ? "tab-active" : ""}`}
+						onClick={() => setActiveTab("votes")}
+						type="button"
+					>
+						투표
 					</button>
 					<button
 						className={`tab ${activeTab === "account" ? "tab-active" : ""}`}
@@ -38,7 +46,8 @@ function ProfilePage() {
 			</div>
 
 			<div>
-				{activeTab === "history" && <HistoryTab />}
+				{activeTab === "suggestions" && <MyTitleSuggestions />}
+				{activeTab === "votes" && <MyVotedSuggestions />}
 				{activeTab === "account" && <AccountTab />}
 			</div>
 		</div>
