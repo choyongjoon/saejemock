@@ -39,8 +39,22 @@ export const Route = createRootRouteWithContext<{
 				href: "https://cdn.jsdelivr.net",
 			},
 			{
+				rel: "preconnect",
+				href: "https://pagead2.googlesyndication.com",
+			},
+			{
+				rel: "dns-prefetch",
+				href: "https://clerk.com",
+			},
+			{
+				rel: "dns-prefetch",
+				href: "https://convex.cloud",
+			},
+			{
 				rel: "stylesheet",
 				href: "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css",
+				media: "print",
+				onLoad: "this.media='all'",
 			},
 			{
 				rel: "stylesheet",
@@ -58,11 +72,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<head>
 				<HeadContent />
 				<ThemeScript />
-				<script
-					async
-					crossOrigin="anonymous"
-					src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8760826937840724"
-				/>
 			</head>
 			<body>
 				<PosthogProvider>
@@ -86,6 +95,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					</ClerkProvider>
 				</PosthogProvider>
 				<Scripts />
+				<script
+					async
+					crossOrigin="anonymous"
+					defer
+					src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8760826937840724"
+				/>
 			</body>
 		</html>
 	);
