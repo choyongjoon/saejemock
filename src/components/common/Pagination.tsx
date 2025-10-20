@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type PaginationProps = {
 	currentPage: number;
@@ -49,11 +50,11 @@ export default function Pagination({
 						search={{ page: currentPage - 1 }}
 						to={basePath}
 					>
-						«
+						<ChevronLeft />
 					</Link>
 				) : (
 					<button className="btn btn-disabled btn-sm join-item" type="button">
-						«
+						<ChevronLeft />
 					</button>
 				)}
 
@@ -122,11 +123,11 @@ export default function Pagination({
 						search={{ page: currentPage + 1 }}
 						to={basePath}
 					>
-						»
+						<ChevronRight />
 					</Link>
 				) : (
 					<button className="btn btn-disabled btn-sm join-item" type="button">
-						»
+						<ChevronRight />
 					</button>
 				)}
 			</div>
