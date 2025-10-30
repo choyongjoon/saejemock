@@ -16,6 +16,20 @@ const config = defineConfig({
 		tanstackStart(),
 		viteReact(),
 	],
+	build: {
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					// Split Clerk into separate chunk (~150KB)
+					"vendor-clerk": ["@clerk/clerk-react"],
+					// Split Convex into separate chunk (~100KB)
+					"vendor-convex": ["convex/react", "@convex-dev/react-query"],
+					// Split React Query into separate chunk (~50KB)
+					"vendor-query": ["@tanstack/react-query"],
+				},
+			},
+		},
+	},
 });
 
 export default config;
