@@ -1,5 +1,6 @@
 import { SignInButton, useUser } from "@clerk/clerk-react";
 import { ThumbsUp } from "lucide-react";
+import { useState } from "react";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { SuggestionMenu } from "./SuggestionMenu";
 
@@ -32,6 +33,7 @@ export function TitleSuggestionCard({
 	onDelete,
 }: TitleSuggestionCardProps) {
 	const { isSignedIn } = useUser();
+	const [isExpanded, setIsExpanded] = useState(false);
 
 	// Check if current user is the creator
 	const isCreator =
@@ -107,10 +109,16 @@ export function TitleSuggestionCard({
 					/>
 				)}
 			</div>
-			<div className="h-full flex-1 items-start">
+			<button
+				className="h-full flex-1 cursor-pointer items-start text-left"
+				onClick={() => setIsExpanded(!isExpanded)}
+				type="button"
+			>
 				<h4 className="font-semibold text-xl">{suggestion.title}</h4>
-				<p className="line-clamp-1 opacity-80">{suggestion.description}</p>
-			</div>
+				<p className={`opacity-80 ${isExpanded ? "" : "line-clamp-1"}`}>
+					{suggestion.description}
+				</p>
+			</button>
 			<div className="text-sm tabular-nums">{suggestion.votesCount}</div>
 			{renderVoteButton()}
 		</li>

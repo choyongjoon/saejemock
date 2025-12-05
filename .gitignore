@@ -11,3 +11,5 @@ count.txt
 .vinxi
 
 .env.local
+*storybook.log
+storybook-static
